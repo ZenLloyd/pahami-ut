@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/**
+ * Material Design 3 (M3) — Opsi A: Hijau Teal (Seed #1F6F5C)
+ * Rekomendasi Resmi Panduan Standar Tim Capstone STSI4440
+ */
+
+@theme {
+  --font-sans: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-container: var(--secondary-container);
+  
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-variant: var(--surface-variant);
+  --color-on-surface-variant: var(--on-surface-variant);
+  
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+}
+
+/* Default M3 Dark Mode (Palet Gelap Opsi A) */
+:root {
+  --primary: #5EDBBB;
+  --on-primary: #00382C;
+  --primary-container: #005141;
+  --on-primary-container: #7DF8D6;
+
+  --secondary: #B2CCC2;
+  --secondary-container: #344C44;
+
+  --tertiary: #A9CBE2;
+  --tertiary-container: #284B5E;
+
+  --error: #FFB4AB;
+  --error-container: #93000A;
+
+  --surface: #191C1B;
+  --on-surface: #E1E3E0;
+  --surface-container: #232725;
+  --surface-container-high: #2D312F;
+  --surface-variant: #3F4945;
+  --on-surface-variant: #BFC9C3;
+
+  --outline: #89938E;
+  --outline-variant: #3F4945;
+}
+
+/* Palet Terang (Light Mode bila diperlukan) */
+[data-theme="light"] {
+  --primary: #006B57;
+  --on-primary: #FFFFFF;
+  --primary-container: #7DF8D6;
+  --on-primary-container: #002019;
+
+  --secondary: #4B635B;
+  --secondary-container: #CDE9DE;
+
+  --tertiary: #416277;
+  --tertiary-container: #C5E7FF;
+
+  --error: #BA1A1A;
+  --error-container: #FFDAD6;
+
+  --surface: #FBFDFA;
+  --on-surface: #191C1B;
+  --surface-container: #EDF1EC;
+  --surface-container-high: #E7EBE6;
+  --surface-variant: #DBE5DF;
+  --on-surface-variant: #3F4945;
+
+  --outline: #6F7975;
+  --outline-variant: #BFC9C3;
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--on-surface);
+  letter-spacing: -0.01em;
+}
+
+/* Subtle Scrollbar M3 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--outline-variant);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--outline);
+}
+
+/* Citation Pulse Highlight */
+@keyframes citationPulse {
+  0% {
+    background-color: rgba(94, 219, 187, 0.25);
+    box-shadow: 0 0 0 2px rgba(94, 219, 187, 0.4);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.citation-highlight {
+  animation: citationPulse 2.5s ease-out forwards;
+}
