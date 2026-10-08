@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SYSTEM_MESSAGES } from "@/lib/messages";
+import { simpanPenggunaBaru } from "@/lib/auth";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
 export default function DaftarPage() {
@@ -24,7 +25,6 @@ export default function DaftarPage() {
 
   const [sedangMemproses, setSedangMemproses] = useState(false);
 
-  // Perhitungan Kekuatan Sandi (Minimal 8 karakter, huruf + angka)
   const hitungKekuatanSandi = (pass: string) => {
     let score = 0;
     if (pass.length >= 8) score += 1;
@@ -109,19 +109,25 @@ export default function DaftarPage() {
       return;
     }
 
-    // Simulasi Cek Email Unik (BR-22 / MSG-A05)
-    if (email.toLowerCase() === "mahasiswa@ecampus.ut.ac.id") {
-      setErrors({ email: SYSTEM_MESSAGES.MSG_A05 });
-      return;
-    }
-
     setSedangMemproses(true);
 
     setTimeout(() => {
       setSedangMemproses(false);
-      // Sukses: Arahkan ke Beranda Mahasiswa (S-06)
+
+      // Simpan Akun Baru ke Database Lokal (BP-01)
+      const hasil = simpanPenggunaBaru(nama, email, kataSandi);
+
+      if (!hasil.success) {
+        if (hasil.error === "EMAIL_DUPLIKAT") {
+          // BR-22 / MSG-A05: Email sudah terdaftar
+          setErrors({ email: SYSTEM_MESSAGES.MSG_A05 });
+        }
+        return;
+      }
+
+      // Sukses: Sesuai BP-01 Langkah 5 -> Buat sesi login dan arahkan ke Beranda S-06
       router.push("/beranda?baru=true");
-    }, 900);
+    }, 700);
   };
 
   return (

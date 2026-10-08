@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SYSTEM_MESSAGES } from "@/lib/messages";
+import { verifikasiLogin } from "@/lib/auth";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
 export default function MasukPage() {
@@ -47,29 +48,28 @@ export default function MasukPage() {
 
     setTimeout(() => {
       setSedangMemproses(false);
-      const emailBersih = email.trim().toLowerCase();
 
-      // Kasus 1: Akun Dinonaktifkan (MSG-A02 / BR-23)
-      if (emailBersih === "nonaktif@ecampus.ut.ac.id") {
-        setPesanError(SYSTEM_MESSAGES.MSG_A02);
+      // Verifikasi Riil ke Database Akun Lokal
+      const hasil = verifikasiLogin(email, kataSandi);
+
+      if (!hasil.success) {
+        if (hasil.status === "NONAKTIF") {
+          // BP-02 / BR-23: Akun Dinonaktifkan
+          setPesanError(SYSTEM_MESSAGES.MSG_A02);
+        } else {
+          // BP-02 / MSG-A01: Email atau kata sandi salah
+          setPesanError(SYSTEM_MESSAGES.MSG_A01);
+        }
         return;
       }
 
-      // Kasus 2: Email atau Sandi Salah (MSG-A01)
-      if (kataSandi === "salah123") {
-        setPesanError(SYSTEM_MESSAGES.MSG_A01);
-        return;
-      }
-
-      // Kasus 3: Admin (BR-31 -> Dashboard Admin S-14)
-      if (emailBersih === "admin@ecampus.ut.ac.id") {
+      // BR-31: Arahkan Sesuai Peran
+      if (hasil.user?.role === "admin") {
         router.push("/admin");
-        return;
+      } else {
+        router.push("/beranda");
       }
-
-      // Kasus 4: Mahasiswa Normal (BR-31 -> Beranda Mahasiswa S-06)
-      router.push("/beranda");
-    }, 700);
+    }, 600);
   };
 
   const isiAkunDemo = (demoEmail: string, demoSandi: string) => {
@@ -103,7 +103,7 @@ export default function MasukPage() {
             Masuk ke Akun
           </h1>
           <p className="text-xs text-on-surface-variant mt-1">
-            Gunakan email universitas atau akun yang telah terdaftar.
+            Gunakan email universitas dan kata sandi yang telah terdaftar.
           </p>
         </div>
 
@@ -181,7 +181,7 @@ export default function MasukPage() {
             )}
           </div>
 
-          {/* Tombol Utama Filled M3 (Satu Aksi Utama per Layar) */}
+          {/* Tombol Utama Filled M3 */}
           <div className="pt-2">
             <button
               type="submit"
@@ -203,8 +203,8 @@ export default function MasukPage() {
         {/* Demo Credential Selector */}
         <div className="mt-6 p-3.5 rounded-xl bg-surface-container-high border border-outline-variant text-[11px] space-y-2">
           <div className="text-on-surface-variant font-mono flex items-center justify-between text-[10px]">
-            <span>SKENARIO PENGUJIAN:</span>
-            <span>(Klik untuk isi cepat)</span>
+            <span>AKUN UJI COBA RESMI:</span>
+            <span>(Password: rahasia123)</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             <button
