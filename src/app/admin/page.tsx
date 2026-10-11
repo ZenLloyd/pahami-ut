@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { hapusSesi } from "@/lib/auth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   Users,
   FileText,
@@ -105,6 +106,7 @@ export default function AdminDashboardPage() {
           <span className="text-xs text-on-surface-variant hidden sm:inline font-mono">
             admin@ecampus.ut.ac.id
           </span>
+          <ThemeToggle />
           <button
             onClick={handleKeluar}
             className="px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-error text-xs font-medium border border-outline-variant transition flex items-center gap-1.5 cursor-pointer"

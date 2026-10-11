@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   ArrowRight,
   BookOpen,
@@ -28,6 +29,7 @@ export default function LandingPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <Link
             href="/masuk"
             className="px-4 py-2 text-xs text-on-surface hover:text-primary transition font-medium"

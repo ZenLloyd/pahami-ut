@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SYSTEM_MESSAGES } from "@/lib/messages";
 import { simpanPenggunaBaru } from "@/lib/auth";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
 export default function DaftarPage() {
@@ -131,7 +132,11 @@ export default function DaftarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-center items-center px-4 py-12 selection:bg-primary-container selection:text-on-primary-container">
+    <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-center items-center px-4 py-12 selection:bg-primary-container selection:text-on-primary-container relative">
+      <div className="fixed top-5 right-5 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Brand Header */}
       <div className="mb-6 flex flex-col items-center text-center">
         <Link href="/" className="flex items-center gap-2 mb-2 hover:opacity-85 transition">

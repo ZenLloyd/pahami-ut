@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { mockStudent } from "@/data/mockData";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { BookOpen, Layers, CheckCircle2, History, Search } from "lucide-react";
 
 export function Navbar() {
@@ -79,6 +80,11 @@ export function Navbar() {
             ⌘K
           </kbd>
         </button>
+
+        <div className="h-4 w-[1px] bg-outline-variant"></div>
+
+        {/* Theme Toggle (Dark / Light M3) */}
+        <ThemeToggle />
 
         <div className="h-4 w-[1px] bg-outline-variant"></div>
 
