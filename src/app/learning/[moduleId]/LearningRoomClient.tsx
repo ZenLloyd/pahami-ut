@@ -265,11 +265,11 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
           {/* Module Reader Body */}
           <div
             ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-8 md:p-10 bg-surface-container-lowest"
+            className="flex-1 overflow-auto custom-scrollbar p-4 sm:p-8 md:p-10 bg-surface-container-lowest"
           >
             <div
-              style={{ transform: `scale(${zoom / 100})` }}
-              className="max-w-2xl mx-auto bg-surface-container border border-outline-variant rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl text-on-surface leading-relaxed font-sans select-text transition-transform duration-150 origin-top"
+              style={{ zoom: `${zoom}%` }}
+              className="max-w-2xl mx-auto bg-surface-container border border-outline-variant rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl text-on-surface leading-relaxed font-sans select-text transition-all duration-150 my-2"
             >
               {/* Document Header */}
               <div className="border-b border-outline-variant pb-4 mb-6">
