@@ -56,7 +56,7 @@ export default function AdminDashboardPage() {
     },
     {
       nama: "Budi Santoso",
-      email: "nonaktif@ecampus.ut.ac.id",
+      email: "budsant@ecampus.ut.ac.id",
       bergabung: "5 Okt 2026",
       dokumen: 1,
       status: "Nonaktif",

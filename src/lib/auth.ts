@@ -27,7 +27,7 @@ const DEFAULT_USERS: Pengguna[] = [
   },
   {
     nama: "Budi Santoso",
-    email: "nonaktif@ecampus.ut.ac.id",
+    email: "budsant@ecampus.ut.ac.id",
     kataSandi: "rahasia123",
     role: "mahasiswa",
     isAktif: false, // BR-23: Akun nonaktif

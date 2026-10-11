@@ -220,7 +220,7 @@ export default function MasukPage() {
             </button>
             <button
               type="button"
-              onClick={() => isiAkunDemo("nonaktif@ecampus.ut.ac.id", "rahasia123")}
+              onClick={() => isiAkunDemo("budsant@ecampus.ut.ac.id", "rahasia123")}
               className="px-2.5 py-1 rounded-lg bg-surface hover:bg-surface-variant text-error text-[10px] border border-outline-variant transition cursor-pointer"
             >
               Mahasiswa Nonaktif
