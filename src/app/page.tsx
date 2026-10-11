@@ -47,11 +47,6 @@ export default function LandingPage() {
 
       {/* 2. HERO SECTION */}
       <section className="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center space-y-6">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-surface-container border border-outline-variant text-xs text-on-surface font-mono">
-          <span className="w-2 h-2 rounded-full bg-primary"></span>
-          <span>Studi Kasus: Mahasiswa Universitas Terbuka</span>
-        </div>
-
         <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-on-surface max-w-3xl mx-auto leading-tight">
           Belajar Mandiri Modul Tebal, Tanpa Halusinasi AI.
         </h1>
@@ -80,7 +75,7 @@ export default function LandingPage() {
         <div className="pt-8">
           <div className="p-5 sm:p-7 rounded-2xl bg-surface-container border border-outline-variant shadow-2xl text-left max-w-3xl mx-auto">
             <div className="flex items-center justify-between pb-3.5 border-b border-outline-variant text-xs text-on-surface-variant font-mono">
-              <span className="text-primary font-medium">⚡ Alur Belajar Cerdas</span>
+              <span className="text-primary font-medium">Alur Belajar Cerdas</span>
               <span>Dokumen: MSIM4201_Modul2.pdf</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 mt-4 text-xs">
@@ -189,7 +184,7 @@ export default function LandingPage() {
           </div>
 
           <div className="p-5 rounded-2xl bg-surface-container border border-outline-variant space-y-2">
-            <CheckCircle2 className="w-5 h-5 text-amber-400" />
+            <CheckCircle2 className="w-5 h-5 text-primary" />
             <h3 className="text-sm font-semibold text-on-surface">3. Latihan & Pembahasan</h3>
             <p className="text-xs text-on-surface-variant leading-relaxed">
               5 soal pilihan ganda adaptif per topik dengan pembahasan langsung dan rujukan buku.
