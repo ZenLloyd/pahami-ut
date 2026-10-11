@@ -76,7 +76,7 @@ export function LogoutModal({
           <button
             type="button"
             onClick={handleConfirmLogout}
-            className="px-4 py-2 rounded-full bg-error hover:opacity-90 text-white font-semibold text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-semibold text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Ya, Keluar</span>
