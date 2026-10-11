@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { hapusSesi } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LogoutModal } from "@/components/LogoutModal";
 import {
   Users,
   FileText,
@@ -21,11 +21,7 @@ import {
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [rentangHari, setRentangHari] = useState<"7" | "30">("7");
-
-  const handleKeluar = () => {
-    hapusSesi();
-    router.push("/masuk");
-  };
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Mock Data Pengguna Terbaru (Sesuai Dokumen S-14)
   const penggunaTerbaru = [
@@ -108,7 +104,7 @@ export default function AdminDashboardPage() {
           </span>
           <ThemeToggle />
           <button
-            onClick={handleKeluar}
+            onClick={() => setShowLogoutModal(true)}
             className="px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-error text-xs font-medium border border-outline-variant transition flex items-center gap-1.5 cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -331,6 +327,14 @@ export default function AdminDashboardPage() {
           </div>
         </section>
       </main>
+
+      {/* Dialog Konfirmasi Keluar M3 Admin */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        userName="Administrator UT"
+        userRole="Admin"
+      />
     </div>
   );
 }

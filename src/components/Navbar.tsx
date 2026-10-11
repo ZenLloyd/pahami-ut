@@ -1,21 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { mockStudent } from "@/data/mockData";
-import { hapusSesi } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/BottomNav";
+import { LogoutModal } from "@/components/LogoutModal";
 import { BookOpen, Layers, CheckCircle2, History, Search, LogOut } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
-
-  const handleKeluar = () => {
-    hapusSesi();
-    router.push("/masuk");
-  };
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   return (
     <>
@@ -114,7 +110,7 @@ export function Navbar() {
 
           {/* Tombol Keluar Mahasiswa (Sama Seperti di Admin) */}
           <button
-            onClick={handleKeluar}
+            onClick={() => setShowLogoutModal(true)}
             className="px-2.5 sm:px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-error text-xs font-medium border border-outline-variant transition flex items-center gap-1.5 cursor-pointer ml-0.5"
             title="Keluar dari Akun"
           >
@@ -125,7 +121,15 @@ export function Navbar() {
       </header>
 
       {/* Bar Bawah Khusus HP (M3 Compact Window Class) */}
-      <BottomNav />
+      <BottomNav onOpenLogout={() => setShowLogoutModal(true)} />
+
+      {/* Dialog Konfirmasi Keluar M3 */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        userName={mockStudent.name}
+        userRole="Mahasiswa"
+      />
     </>
   );
 }
