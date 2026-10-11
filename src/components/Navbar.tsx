@@ -1,19 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { mockStudent } from "@/data/mockData";
+import { hapusSesi } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/BottomNav";
-import { BookOpen, Layers, CheckCircle2, History, Search } from "lucide-react";
+import { BookOpen, Layers, CheckCircle2, History, Search, LogOut } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleKeluar = () => {
+    hapusSesi();
+    router.push("/masuk");
+  };
 
   return (
     <>
-      <header className="h-16 border-b border-outline-variant bg-surface-container px-4 md:px-6 flex items-center justify-between shrink-0 sticky top-0 z-50 select-none">
-        <div className="flex items-center gap-6">
+      <header className="h-16 border-b border-outline-variant bg-surface-container px-3 sm:px-4 md:px-6 flex items-center justify-between shrink-0 sticky top-0 z-50 select-none">
+        <div className="flex items-center gap-4 sm:gap-6">
           <Link href="/beranda" className="flex items-center gap-2.5 hover:opacity-85 transition">
             <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
               UT
@@ -71,7 +78,7 @@ export function Navbar() {
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={() => alert("Pencarian cerdas teks modul: Tekan ⌘K")}
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-outline-variant text-xs text-on-surface-variant hover:text-on-surface transition"
@@ -83,7 +90,7 @@ export function Navbar() {
             </kbd>
           </button>
 
-          <div className="h-4 w-[1px] bg-outline-variant"></div>
+          <div className="h-4 w-[1px] bg-outline-variant hidden sm:block"></div>
 
           {/* Theme Toggle (Dark / Light M3) */}
           <ThemeToggle />
@@ -91,11 +98,11 @@ export function Navbar() {
           <div className="h-4 w-[1px] bg-outline-variant"></div>
 
           {/* User Profile Pill */}
-          <div className="flex items-center gap-2 pl-1">
+          <div className="flex items-center gap-2 pl-0.5 sm:pl-1">
             <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container font-bold flex items-center justify-center text-xs shadow-sm">
               {mockStudent.name.slice(0, 2).toUpperCase()}
             </div>
-            <div className="hidden md:block text-left">
+            <div className="hidden lg:block text-left">
               <div className="text-xs font-semibold text-on-surface leading-tight">
                 {mockStudent.name}
               </div>
@@ -104,6 +111,16 @@ export function Navbar() {
               </div>
             </div>
           </div>
+
+          {/* Tombol Keluar Mahasiswa (Sama Seperti di Admin) */}
+          <button
+            onClick={handleKeluar}
+            className="px-2.5 sm:px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-error text-xs font-medium border border-outline-variant transition flex items-center gap-1.5 cursor-pointer ml-0.5"
+            title="Keluar dari Akun"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Keluar</span>
+          </button>
         </div>
       </header>
 

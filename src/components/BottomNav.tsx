@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { hapusSesi } from "@/lib/auth";
 import { BookOpen, Layers, CheckCircle2, User } from "lucide-react";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const navItems = [
     {
@@ -32,7 +34,13 @@ export function BottomNav() {
       href: "#profil",
       icon: User,
       isActive: false,
-      onClick: () => alert("Fitur Profil Mahasiswa akan aktif di Paket Fitur 5."),
+      onClick: () => {
+        const keluar = confirm("Mahasiswa: Muhammad Latif (NIM: 045123456)\n\nApakah kamu ingin keluar dari akun?");
+        if (keluar) {
+          hapusSesi();
+          router.push("/masuk");
+        }
+      },
     },
   ];
 
