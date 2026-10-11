@@ -5,6 +5,7 @@ import Link from "next/link";
 import { mockInitialMessages } from "@/data/mockData";
 import { ChatMessage } from "@/types";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LogoUT } from "@/components/LogoUT";
 import {
   ArrowLeft,
   BookOpen,
@@ -105,9 +106,7 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
             title="Kembali ke Beranda"
           >
             <ArrowLeft className="w-4 h-4 text-on-surface-variant" />
-            <div className="w-6 h-6 rounded bg-primary text-on-primary font-bold flex items-center justify-center text-xs tracking-tighter shadow-sm">
-              UT
-            </div>
+            <LogoUT className="h-5 w-auto object-contain" width={26} height={21} />
             <span className="font-semibold text-on-surface tracking-tight text-xs hidden sm:inline">
               Pahami
             </span>

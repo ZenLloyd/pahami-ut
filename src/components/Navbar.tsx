@@ -7,6 +7,7 @@ import { mockStudent } from "@/data/mockData";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/BottomNav";
 import { LogoutModal } from "@/components/LogoutModal";
+import { LogoUT } from "@/components/LogoUT";
 import { BookOpen, Layers, CheckCircle2, History, Search, LogOut } from "lucide-react";
 
 export function Navbar() {
@@ -18,9 +19,7 @@ export function Navbar() {
       <header className="h-16 border-b border-outline-variant bg-surface-container px-3 sm:px-4 md:px-6 flex items-center justify-between shrink-0 sticky top-0 z-50 select-none">
         <div className="flex items-center gap-4 sm:gap-6">
           <Link href="/beranda" className="flex items-center gap-2.5 hover:opacity-85 transition">
-            <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
-              UT
-            </div>
+            <LogoUT />
             <span className="font-semibold text-on-surface tracking-tight text-sm">
               Pahami
             </span>

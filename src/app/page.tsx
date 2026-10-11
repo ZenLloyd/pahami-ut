@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LogoUT } from "@/components/LogoUT";
 import {
   ArrowRight,
   BookOpen,
@@ -17,9 +18,7 @@ export default function LandingPage() {
       {/* 1. NAVIGASI ATAS */}
       <header className="h-16 border-b border-outline-variant bg-surface/90 backdrop-blur sticky top-0 z-50 px-4 sm:px-6 flex items-center justify-between">
         <div className="flex items-center gap-2 sm:gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
-            UT
-          </div>
+          <LogoUT />
           <span className="font-semibold text-base tracking-tight text-on-surface">
             Pahami
           </span>

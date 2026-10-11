@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { SYSTEM_MESSAGES } from "@/lib/messages";
 import { simpanPenggunaBaru } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LogoUT } from "@/components/LogoUT";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
 export default function DaftarPage() {
@@ -140,9 +141,7 @@ export default function DaftarPage() {
       {/* Brand Header */}
       <div className="mb-6 flex flex-col items-center text-center">
         <Link href="/" className="flex items-center gap-2 mb-2 hover:opacity-85 transition">
-          <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
-            UT
-          </div>
+          <LogoUT />
           <span className="font-semibold text-base text-on-surface tracking-tight">
             Pahami
           </span>

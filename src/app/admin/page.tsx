@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogoutModal } from "@/components/LogoutModal";
+import { LogoUT } from "@/components/LogoUT";
 import {
   Users,
   FileText,
@@ -68,9 +69,7 @@ export default function AdminDashboardPage() {
       <header className="h-16 border-b border-outline-variant bg-surface-container px-4 sm:px-6 flex items-center justify-between shrink-0 sticky top-0 z-50">
         <div className="flex items-center gap-6">
           <Link href="/admin" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
-              UT
-            </div>
+            <LogoUT />
             <span className="font-semibold text-base text-on-surface tracking-tight">
               Pahami Admin
             </span>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { SYSTEM_MESSAGES } from "@/lib/messages";
+import { LogoUT } from "@/components/LogoUT";
 import { ArrowLeft, CheckCircle2, Loader2, Mail } from "lucide-react";
 
 export default function LupaSandiPage() {
@@ -49,9 +50,7 @@ export default function LupaSandiPage() {
     <div className="min-h-screen bg-surface text-on-surface flex flex-col justify-center items-center px-4 py-12 selection:bg-primary-container selection:text-on-primary-container">
       <div className="mb-6 flex flex-col items-center text-center">
         <Link href="/" className="flex items-center gap-2 mb-2 hover:opacity-85 transition">
-          <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
-            UT
-          </div>
+          <LogoUT />
           <span className="font-semibold text-base text-on-surface tracking-tight">
             Pahami
           </span>
