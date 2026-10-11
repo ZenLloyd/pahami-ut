@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import { mockInitialMessages } from "@/data/mockData";
 import { ChatMessage } from "@/types";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   ArrowLeft,
   BookOpen,
@@ -18,11 +19,13 @@ import {
   Split,
   Maximize2,
   Trash2,
+  MessageSquare,
 } from "lucide-react";
 
 export function LearningRoomClient({ moduleId }: { moduleId: string }) {
   const [zoom, setZoom] = useState(100);
   const [viewMode, setViewMode] = useState<"split" | "reader">("split");
+  const [mobileTab, setMobileTab] = useState<"materi" | "ai">("materi");
   const [messages, setMessages] = useState<ChatMessage[]>(mockInitialMessages);
   const [inputPrompt, setInputPrompt] = useState("");
 
@@ -34,16 +37,20 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
   };
 
   const handleCitationClick = () => {
-    if (citationTargetRef.current) {
-      citationTargetRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-      citationTargetRef.current.classList.add("citation-highlight");
-      setTimeout(() => {
-        citationTargetRef.current?.classList.remove("citation-highlight");
-      }, 2500);
-    }
+    // Di layar HP: otomatis pindah ke tab materi dan fokuskan kutipan
+    setMobileTab("materi");
+    setTimeout(() => {
+      if (citationTargetRef.current) {
+        citationTargetRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        citationTargetRef.current.classList.add("citation-highlight");
+        setTimeout(() => {
+          citationTargetRef.current?.classList.remove("citation-highlight");
+        }, 2500);
+      }
+    }, 150);
   };
 
   const handleSendMessage = () => {
@@ -66,7 +73,7 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
       const aiReply: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         sender: "ai",
-        text: `Berdasarkan Modul 02 BMP Struktur Data (Halaman 14–16), pertanyaanmu berkaitan dengan batas memori stack. Operasi push harus selalu memeriksa apakah kapasitas memori penuh sebelum menambahkan elemen baru guna mencegah Stack Overflow.`,
+        text: `Berdasarkan Modul 02 BMP Struktur Data (Halaman 14–16), pertanyaanmu berkaitan dengan batas kapasitas stack. Operasi push harus selalu memeriksa apakah batas memori penuh (overflow check) sebelum menambahkan elemen baru guna mencegah kegagalan sistem.`,
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -81,54 +88,57 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
               "Karakteristik utama Stack adalah kepatuhan terhadap aturan Last In, First Out (LIFO)...",
           },
         ],
-        suggestedFollowups: ["Bagaimana pencegahan underflow pada pop()?"],
+        suggestedFollowups: ["Bagaimana penanganan underflow pada operasi pop()?"],
       };
       setMessages((prev) => [...prev, aiReply]);
     }, 700);
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#09090b] text-zinc-100 text-sm select-none">
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-surface text-on-surface text-sm select-none">
       {/* TOP NAVBAR / HEADER */}
-      <header className="h-13 border-b border-zinc-800 bg-[#121215] px-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="h-14 border-b border-outline-variant bg-surface-container px-3 sm:px-4 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
           <Link
-            href="/"
-            className="flex items-center gap-2 pr-3 border-r border-zinc-800 hover:opacity-80 transition"
-            title="Kembali ke Dashboard"
+            href="/beranda"
+            className="flex items-center gap-2 pr-2 sm:pr-3 border-r border-outline-variant hover:opacity-85 transition shrink-0"
+            title="Kembali ke Beranda"
           >
-            <ArrowLeft className="w-4 h-4 text-zinc-400" />
-            <div className="w-6 h-6 rounded bg-zinc-100 text-zinc-950 font-bold flex items-center justify-center text-xs tracking-tighter shadow-sm">
+            <ArrowLeft className="w-4 h-4 text-on-surface-variant" />
+            <div className="w-6 h-6 rounded bg-primary text-on-primary font-bold flex items-center justify-center text-xs tracking-tighter shadow-sm">
               UT
             </div>
-            <span className="font-semibold text-zinc-100 tracking-tight text-xs hidden sm:inline">
-              Sistem Modul Mandiri
+            <span className="font-semibold text-on-surface tracking-tight text-xs hidden sm:inline">
+              Pahami
             </span>
           </Link>
 
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-xs text-zinc-400 font-mono">
-            <Link href="/" className="hover:text-zinc-200">
-              Dashboard
+          <nav className="flex items-center gap-1.5 text-xs text-on-surface-variant font-mono truncate">
+            <Link href="/beranda" className="hover:text-on-surface hidden sm:inline">
+              Beranda
             </Link>
+            <span className="hidden sm:inline">/</span>
+            <span className="truncate">MSIM4201</span>
             <span>/</span>
-            <span className="text-zinc-400">MSIM4201</span>
-            <span>/</span>
-            <span className="text-zinc-200 font-medium bg-zinc-800/60 px-2 py-0.5 rounded border border-zinc-700/50">
-              Modul 02: KB 1 (Stack & Queue)
+            <span className="text-on-surface font-medium bg-surface-container-high px-2 py-0.5 rounded border border-outline-variant truncate">
+              Modul 02: KB 1
             </span>
           </nav>
         </div>
 
-        {/* View Switchers */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-md p-0.5">
+        {/* View Switchers & Controls */}
+        <div className="flex items-center gap-2 shrink-0">
+          <ThemeToggle />
+
+          {/* Desktop Dual Mode Switcher */}
+          <div className="hidden md:flex items-center bg-surface border border-outline-variant rounded-full p-0.5">
             <button
               onClick={() => setViewMode("split")}
-              className={`px-2.5 py-1 text-xs rounded flex items-center gap-1.5 transition cursor-pointer ${
+              className={`px-3 py-1 text-xs rounded-full flex items-center gap-1.5 transition cursor-pointer ${
                 viewMode === "split"
-                  ? "bg-zinc-800 text-zinc-100 font-medium"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-primary text-on-primary font-medium"
+                  : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
               <Split className="w-3.5 h-3.5" />
@@ -136,10 +146,10 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
             </button>
             <button
               onClick={() => setViewMode("reader")}
-              className={`px-2.5 py-1 text-xs rounded flex items-center gap-1.5 transition cursor-pointer ${
+              className={`px-3 py-1 text-xs rounded-full flex items-center gap-1.5 transition cursor-pointer ${
                 viewMode === "reader"
-                  ? "bg-zinc-800 text-zinc-100 font-medium"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-primary text-on-primary font-medium"
+                  : "text-on-surface-variant hover:text-on-surface"
               }`}
             >
               <Maximize2 className="w-3.5 h-3.5" />
@@ -149,73 +159,103 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
         </div>
       </header>
 
+      {/* MOBILE TAB SWITCHER (Per Dokumen Panduan Tim: HP: tab Materi / Tanya AI) */}
+      <div className="md:hidden flex items-center border-b border-outline-variant bg-surface-container shrink-0">
+        <button
+          onClick={() => setMobileTab("materi")}
+          className={`flex-1 py-2.5 text-xs font-semibold flex items-center justify-center gap-2 border-b-2 transition cursor-pointer ${
+            mobileTab === "materi"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-on-surface-variant hover:text-on-surface"
+          }`}
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>Materi Modul</span>
+        </button>
+
+        <button
+          onClick={() => setMobileTab("ai")}
+          className={`flex-1 py-2.5 text-xs font-semibold flex items-center justify-center gap-2 border-b-2 transition cursor-pointer ${
+            mobileTab === "ai"
+              ? "border-primary text-primary bg-primary/5"
+              : "border-transparent text-on-surface-variant hover:text-on-surface"
+          }`}
+        >
+          <Sparkles className="w-3.5 h-3.5 text-primary" />
+          <span>Tanya AI</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+        </button>
+      </div>
+
       {/* MAIN WORKSPACE */}
-      <main className="flex-1 flex overflow-hidden">
+      <main className="flex-1 flex overflow-hidden relative">
         {/* LEFT PANEL: DOCUMENT / MODULE VIEWER */}
         <section
-          className={`flex flex-col border-r border-zinc-800 bg-[#09090b] transition-all duration-200 ${
-            viewMode === "reader" ? "w-full" : "w-[60%]"
+          className={`flex-col border-r border-outline-variant bg-surface transition-all duration-200 ${
+            mobileTab === "materi" ? "flex w-full" : "hidden md:flex"
+          } ${
+            viewMode === "reader" ? "md:w-full" : "md:w-[60%]"
           }`}
         >
           {/* Module Toolbar */}
-          <div className="h-10 border-b border-zinc-800 bg-[#121215] px-4 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-medium text-zinc-300 flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
-                MSIM4201_Modul_02.pdf
+          <div className="h-10 border-b border-outline-variant bg-surface-container px-3 sm:px-4 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 truncate">
+              <span className="text-xs font-medium text-on-surface flex items-center gap-1.5 truncate">
+                <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                <span className="truncate">MSIM4201_Modul_02.pdf</span>
               </span>
-              <span className="text-xs text-zinc-400 font-mono bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 rounded">
-                Halaman 14 dari 84
+              <span className="text-[11px] text-on-surface-variant font-mono bg-surface border border-outline-variant px-1.5 py-0.5 rounded shrink-0">
+                Hal. 14 / 84
               </span>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 shrink-0">
               <button
-                className="p-1.5 text-zinc-400 hover:text-zinc-200 rounded hover:bg-zinc-800 transition"
+                className="p-1.5 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-variant transition"
                 title="Halaman Sebelumnya"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
-                className="p-1.5 text-zinc-400 hover:text-zinc-200 rounded hover:bg-zinc-800 transition"
+                className="p-1.5 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-variant transition"
                 title="Halaman Berikutnya"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
 
-              <div className="h-3 w-[1px] bg-zinc-800 mx-1"></div>
+              <div className="h-3 w-[1px] bg-outline-variant mx-1"></div>
 
               {/* Interactive Zoom Controls */}
-              <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded px-1 py-0.5 gap-0.5">
+              <div className="flex items-center bg-surface border border-outline-variant rounded-full px-1 py-0.5 gap-0.5">
                 <button
                   onClick={() => handleZoom(-10)}
-                  className="p-1 text-zinc-400 hover:text-zinc-200 rounded hover:bg-zinc-800 transition cursor-pointer"
+                  className="p-1 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-variant transition cursor-pointer"
                   title="Perkecil (Zoom Out)"
                 >
                   <Minus className="w-3 h-3" />
                 </button>
                 <button
                   onClick={() => setZoom(100)}
-                  className="text-[11px] text-zinc-300 hover:text-white px-1.5 py-0.5 rounded hover:bg-zinc-800 font-mono flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] text-on-surface hover:text-primary px-1.5 py-0.5 rounded-full font-mono flex items-center gap-1 cursor-pointer"
                   title="Reset ke 100%"
                 >
                   <span>{zoom}%</span>
-                  <RotateCcw className="w-2.5 h-2.5 text-zinc-500" />
+                  <RotateCcw className="w-2.5 h-2.5 text-on-surface-variant" />
                 </button>
                 <button
                   onClick={() => handleZoom(10)}
-                  className="p-1 text-zinc-400 hover:text-zinc-200 rounded hover:bg-zinc-800 transition cursor-pointer"
+                  className="p-1 text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-variant transition cursor-pointer"
                   title="Perbesar (Zoom In)"
                 >
                   <Plus className="w-3 h-3" />
                 </button>
               </div>
 
-              <div className="h-3 w-[1px] bg-zinc-800 mx-1"></div>
+              <div className="h-3 w-[1px] bg-outline-variant mx-1 hidden sm:block"></div>
 
               <button
                 onClick={() => alert("Membuka berkas dokumen asli BMP UT")}
-                className="p-1.5 text-zinc-400 hover:text-zinc-200 rounded hover:bg-zinc-800 transition"
+                className="p-1.5 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-variant transition hidden sm:inline-flex"
                 title="Buka Dokumen Asli"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -226,29 +266,29 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
           {/* Module Reader Body */}
           <div
             ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 bg-[#0c0c0e]"
+            className="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-8 md:p-10 bg-surface-container-lowest"
           >
             <div
               style={{ transform: `scale(${zoom / 100})` }}
-              className="max-w-2xl mx-auto bg-[#121215] border border-zinc-800 rounded-lg p-8 md:p-10 shadow-2xl text-zinc-300 leading-relaxed font-sans select-text transition-transform duration-150 origin-top"
+              className="max-w-2xl mx-auto bg-surface-container border border-outline-variant rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl text-on-surface leading-relaxed font-sans select-text transition-transform duration-150 origin-top"
             >
               {/* Document Header */}
-              <div className="border-b border-zinc-800 pb-4 mb-6">
-                <div className="text-[11px] font-mono tracking-wider text-sky-400 uppercase font-semibold">
+              <div className="border-b border-outline-variant pb-4 mb-6">
+                <div className="text-[11px] font-mono tracking-wider text-primary uppercase font-semibold">
                   Kegiatan Belajar 1
                 </div>
-                <h1 className="text-xl font-bold text-zinc-100 tracking-tight mt-1">
+                <h1 className="text-lg sm:text-xl font-bold text-on-surface tracking-tight mt-1">
                   Konsep Dasar Stack (Tumpukan) & Prinsip LIFO
                 </h1>
-                <p className="text-xs text-zinc-500 font-mono mt-1">
+                <p className="text-xs text-on-surface-variant font-mono mt-1">
                   Buku Materi Pokok UT • MSIM4201 / Modul 2 / Halaman 14
                 </p>
               </div>
 
               {/* Content Paragraphs */}
-              <p className="mb-4 text-[13px] leading-6 text-zinc-300">
+              <p className="mb-4 text-xs sm:text-[13px] leading-6 text-on-surface">
                 Secara konseptual,{" "}
-                <strong className="text-zinc-100 font-semibold">
+                <strong className="text-primary font-semibold">
                   Stack (tumpukan)
                 </strong>{" "}
                 adalah struktur data linear di mana penambahan elemen baru dan
@@ -259,12 +299,12 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
               {/* Highlight Target for AI Citation */}
               <div
                 ref={citationTargetRef}
-                className="p-3 my-4 rounded border border-sky-500/30 bg-sky-500/5 text-zinc-200 transition-all duration-300"
+                className="p-3.5 my-4 rounded-xl border border-primary/30 bg-primary/10 text-on-surface transition-all duration-300"
               >
-                <div className="flex items-center gap-1.5 text-[11px] text-sky-400 font-mono font-medium mb-1">
+                <div className="flex items-center gap-1.5 text-[11px] text-primary font-mono font-medium mb-1">
                   <span>📌</span> Rujukan Resmi Modul — Halaman 14 Paragraf 3:
                 </div>
-                <p className="text-[13px] leading-6 italic text-zinc-200">
+                <p className="text-xs sm:text-[13px] leading-6 italic text-on-surface">
                   &quot;Karakteristik utama dari struktur Stack adalah
                   kepatuhannya terhadap aturan{" "}
                   <strong>Last In, First Out (LIFO)</strong>. Artinya, elemen
@@ -274,61 +314,78 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                 </p>
               </div>
 
-              <p className="mb-4 text-[13px] leading-6 text-zinc-300">
+              <p className="mb-4 text-xs sm:text-[13px] leading-6 text-on-surface">
                 Operasi dasar pada stack mencakup dua operasi fundamental:
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                <div className="p-3 rounded-md bg-zinc-900 border border-zinc-800">
-                  <div className="font-mono text-xs font-semibold text-zinc-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                <div className="p-3 rounded-xl bg-surface border border-outline-variant">
+                  <div className="font-mono text-xs font-semibold text-primary">
                     1. Operasi Push
                   </div>
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
                     Menambahkan elemen baru ke posisi paling atas tumpukan jika
                     kapasitas memori belum penuh (overflow check).
                   </p>
                 </div>
-                <div className="p-3 rounded-md bg-zinc-900 border border-zinc-800">
-                  <div className="font-mono text-xs font-semibold text-zinc-100">
+                <div className="p-3 rounded-xl bg-surface border border-outline-variant">
+                  <div className="font-mono text-xs font-semibold text-primary">
                     2. Operasi Pop
                   </div>
-                  <p className="text-xs text-zinc-400 mt-1">
+                  <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
                     Mengambil atau menghapus elemen teratas dari tumpukan jika
                     tumpukan tidak kosong (underflow check).
                   </p>
                 </div>
               </div>
 
-              <div className="border-t border-zinc-800 pt-4 mt-8 flex items-center justify-between text-xs text-zinc-500 font-mono">
+              <div className="border-t border-outline-variant pt-4 mt-8 flex items-center justify-between text-xs text-on-surface-variant font-mono">
                 <span>MSIM4201 / Modul 02</span>
                 <span>Halaman 14</span>
               </div>
             </div>
           </div>
+
+          {/* Quick Floating Button on Mobile to Jump to AI */}
+          <div className="md:hidden fixed bottom-4 right-4 z-40">
+            <button
+              onClick={() => setMobileTab("ai")}
+              className="px-4 py-2.5 rounded-full bg-primary text-on-primary font-semibold text-xs shadow-lg flex items-center gap-2 active:scale-95 transition"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Tanya AI Modul</span>
+            </button>
+          </div>
         </section>
 
         {/* RIGHT PANEL: AI COPILOT & TUTOR */}
-        {viewMode === "split" && (
-          <section className="w-[40%] flex flex-col bg-[#121215] border-l border-zinc-800">
+        {(viewMode === "split" || mobileTab === "ai") && (
+          <section
+            className={`flex-col bg-surface-container border-l border-outline-variant ${
+              mobileTab === "ai" ? "flex w-full" : "hidden md:flex"
+            } ${
+              viewMode === "reader" ? "md:hidden" : "md:w-[40%]"
+            }`}
+          >
             {/* Header Status */}
-            <div className="h-10 border-b border-zinc-800 px-4 flex items-center justify-between shrink-0 bg-[#121215]">
+            <div className="h-10 border-b border-outline-variant px-4 flex items-center justify-between shrink-0 bg-surface-container">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
-                <span className="text-xs font-semibold text-zinc-200">
+                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                <span className="text-xs font-semibold text-on-surface">
                   Asisten Modul AI
                 </span>
-                <span className="text-[10px] font-mono text-zinc-400 bg-zinc-800/80 px-1.5 py-0.5 rounded border border-zinc-700/50">
+                <span className="text-[10px] font-mono text-primary bg-primary-container px-1.5 py-0.5 rounded border border-primary/20">
                   RAG Grounded
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-zinc-400 font-mono">
+                <span className="text-[11px] text-on-surface-variant font-mono hidden sm:inline">
                   Cakupan: Modul 02
                 </span>
                 <button
                   onClick={() => setMessages([])}
-                  className="text-zinc-400 hover:text-zinc-200 p-1 rounded hover:bg-zinc-800 transition cursor-pointer"
+                  className="text-on-surface-variant hover:text-on-surface p-1 rounded hover:bg-surface-variant transition cursor-pointer"
                   title="Bersihkan Percakapan"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -337,7 +394,7 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
             </div>
 
             {/* Messages Thread */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-4 space-y-4">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -346,15 +403,15 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                   }`}
                 >
                   {msg.sender === "user" ? (
-                    <div className="max-w-[85%] bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-3.5 py-2.5 text-xs leading-relaxed shadow-sm">
+                    <div className="max-w-[85%] bg-primary text-on-primary rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed shadow-sm">
                       {msg.text}
                     </div>
                   ) : (
-                    <div className="w-full bg-[#18181b] border border-zinc-800 rounded-lg p-3.5 shadow-sm space-y-3">
+                    <div className="w-full bg-surface border border-outline-variant rounded-2xl p-3.5 shadow-sm space-y-3">
                       {/* Source Strip */}
                       {msg.citations && msg.citations.length > 0 && (
-                        <div className="flex items-center gap-2 pb-2.5 border-b border-zinc-800/80 text-[11px] text-zinc-400 font-mono flex-wrap">
-                          <span className="text-sky-400 flex items-center gap-1">
+                        <div className="flex items-center gap-2 pb-2.5 border-b border-outline-variant text-[11px] text-on-surface-variant font-mono flex-wrap">
+                          <span className="text-primary flex items-center gap-1">
                             <Sparkles className="w-3 h-3" />
                             <span>Rujukan Ditemukan:</span>
                           </span>
@@ -362,8 +419,8 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                             <button
                               key={c.id}
                               onClick={handleCitationClick}
-                              className="flex items-center gap-1 px-2 py-0.5 rounded bg-sky-950/60 text-sky-300 border border-sky-800/60 hover:bg-sky-900/60 transition cursor-pointer"
-                              title="Klik untuk melihat paragraf di modul"
+                              className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container hover:opacity-85 transition cursor-pointer"
+                              title="Klik untuk membuka paragraf di modul"
                             >
                               <span>
                                 {c.moduleCode} • Hal. {c.page}
@@ -375,16 +432,16 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                       )}
 
                       {/* Content */}
-                      <div className="text-xs text-zinc-300 leading-relaxed whitespace-pre-line">
+                      <div className="text-xs text-on-surface leading-relaxed whitespace-pre-line">
                         {msg.text}
                       </div>
 
                       {/* Prompt Kuis Adaptif */}
                       {msg.quizPrompt && (
-                        <div className="mt-3 p-2.5 rounded bg-zinc-900/90 border border-zinc-800 flex items-center justify-between">
+                        <div className="mt-3 p-2.5 rounded-xl bg-surface-container-high border border-outline-variant flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <span className="text-amber-400 text-xs">💡</span>
-                            <span className="text-[11px] text-zinc-300">
+                            <span className="text-[11px] text-on-surface-variant">
                               Uji pemahamanmu tentang materi ini dengan 1 soal kuis?
                             </span>
                           </div>
@@ -394,7 +451,7 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                                 "Membuka latihan kuis diagnostik untuk konsep LIFO."
                               )
                             }
-                            className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] font-medium text-zinc-100 border border-zinc-700 transition cursor-pointer"
+                            className="px-2.5 py-1 rounded-full bg-primary hover:opacity-90 text-[11px] font-medium text-on-primary transition cursor-pointer whitespace-nowrap"
                           >
                             Mulai Kuis
                           </button>
@@ -402,13 +459,13 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                       )}
 
                       {/* Footnote */}
-                      <div className="flex items-center justify-between pt-1 border-t border-zinc-800/40 text-[10px] text-zinc-500 font-mono">
+                      <div className="flex items-center justify-between pt-1 border-t border-outline-variant text-[10px] text-on-surface-variant font-mono">
                         <span>Model RAG UT-BMP v1.2</span>
                         <span>{msg.timestamp}</span>
                       </div>
                     </div>
                   )}
-                  <span className="text-[10px] text-zinc-500 font-mono mt-1 px-1">
+                  <span className="text-[10px] text-on-surface-variant font-mono mt-1 px-1">
                     {msg.timestamp}
                   </span>
                 </div>
@@ -416,15 +473,15 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
             </div>
 
             {/* Quick Follow-up Pills */}
-            <div className="px-4 py-2 flex items-center gap-1.5 overflow-x-auto border-t border-zinc-800/60 bg-[#121215] text-[11px]">
-              <span className="text-zinc-500 shrink-0 font-mono text-[10px]">
+            <div className="px-3 sm:px-4 py-2 flex items-center gap-1.5 overflow-x-auto border-t border-outline-variant bg-surface-container text-[11px]">
+              <span className="text-on-surface-variant shrink-0 font-mono text-[10px]">
                 Lanjut:
               </span>
               <button
                 onClick={() =>
                   setInputPrompt("Berikan contoh kodingan Stack di Python")
                 }
-                className="px-2.5 py-1 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/60 whitespace-nowrap transition cursor-pointer"
+                className="px-2.5 py-1 rounded-full bg-surface hover:bg-surface-variant text-on-surface border border-outline-variant whitespace-nowrap transition cursor-pointer"
               >
                 Contoh Stack di Python
               </button>
@@ -432,15 +489,15 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                 onClick={() =>
                   setInputPrompt("Apa bedanya operasi peek dan pop?")
                 }
-                className="px-2.5 py-1 rounded-full bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 border border-zinc-700/60 whitespace-nowrap transition cursor-pointer"
+                className="px-2.5 py-1 rounded-full bg-surface hover:bg-surface-variant text-on-surface border border-outline-variant whitespace-nowrap transition cursor-pointer"
               >
                 Beda peek vs pop
               </button>
             </div>
 
-            {/* Chat Input Area */}
-            <div className="p-3 border-t border-zinc-800 bg-[#121215]">
-              <div className="bg-zinc-900/90 border border-zinc-800 focus-within:border-zinc-500 rounded-lg p-2.5 transition">
+            {/* Chat Input Area with Safe Area Bottom */}
+            <div className="p-3 border-t border-outline-variant bg-surface-container pb-[max(env(safe-area-inset-bottom,0px),12px)]">
+              <div className="bg-surface border border-outline-variant focus-within:border-primary rounded-2xl p-2.5 transition">
                 <textarea
                   rows={2}
                   value={inputPrompt}
@@ -452,24 +509,24 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                     }
                   }}
                   placeholder="Tanyakan materi dari Modul 2 ini... (misal: kondisi overflow)"
-                  className="w-full bg-transparent text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none resize-none leading-relaxed"
+                  className="w-full bg-transparent text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none resize-none leading-relaxed"
                 />
 
-                <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60 mt-1">
-                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+                <div className="flex items-center justify-between pt-2 border-t border-outline-variant mt-1">
+                  <div className="flex items-center gap-1.5 text-[11px] text-on-surface-variant">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     <span className="font-mono text-[10px]">
                       Filter: KB 1 (Hal 1–30)
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
+                    <span className="text-[10px] text-on-surface-variant font-mono hidden sm:inline">
                       ↵ Kirim
                     </span>
                     <button
                       onClick={handleSendMessage}
-                      className="px-2.5 py-1 rounded bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center gap-1 transition shadow-sm cursor-pointer"
+                      className="px-3 py-1.5 rounded-full bg-primary hover:opacity-90 text-on-primary font-semibold text-xs flex items-center gap-1 transition shadow-sm cursor-pointer"
                     >
                       <span>Tanya</span>
                       <Send className="w-3 h-3" />

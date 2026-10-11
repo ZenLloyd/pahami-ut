@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans selection:bg-primary-container selection:text-on-primary-container">
       {/* TOP HEADER ADMIN */}
-      <header className="h-16 border-b border-outline-variant bg-surface-container px-6 flex items-center justify-between shrink-0 sticky top-0 z-50">
+      <header className="h-16 border-b border-outline-variant bg-surface-container px-4 sm:px-6 flex items-center justify-between shrink-0 sticky top-0 z-50">
         <div className="flex items-center gap-6">
           <Link href="/admin" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
             <span className="font-semibold text-base text-on-surface tracking-tight">
               Pahami Admin
             </span>
-            <span className="text-[10px] font-mono text-primary bg-primary-container/60 px-2.5 py-0.5 rounded-full border border-primary/30">
+            <span className="text-[10px] font-mono text-primary bg-primary-container/60 px-2.5 py-0.5 rounded-full border border-primary/30 hidden sm:inline">
               Role: Admin
             </span>
           </Link>
@@ -118,7 +118,7 @@ export default function AdminDashboardPage() {
       </header>
 
       {/* MAIN CONTENT S-14 */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8 space-y-6">
         {/* Page Title & Scope */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-outline-variant">
           <div>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -8,9 +8,26 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#1F6F5C" },
+    { media: "(prefers-color-scheme: dark)", color: "#101513" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Pahami — Pembelajaran Mandiri Modul Berbasis AI",
   description: "Sistem Informasi Pembelajaran Mandiri Berbasis Dokumen PDF dengan Asisten AI. Capstone STSI4440 Universitas Terbuka.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Pahami UT",
+  },
 };
 
 export default function RootLayout({

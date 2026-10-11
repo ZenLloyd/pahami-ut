@@ -18,7 +18,7 @@ export default function BerandaMahasiswaPage() {
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 pb-24 md:pb-8 space-y-6">
         {/* S-06: Sapaan & Status Mahasiswa */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-2 border-b border-outline-variant">
           <div>
@@ -34,7 +34,7 @@ export default function BerandaMahasiswaPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap">
             <Link
               href="/upload"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high hover:bg-surface-variant text-on-surface border border-outline-variant text-xs font-medium transition"
@@ -174,7 +174,71 @@ export default function BerandaMahasiswaPage() {
             </span>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Varian Tampilan HP: Mobile Card List */}
+          <div className="md:hidden divide-y divide-outline-variant/60">
+            {mockModules.map((mod) => (
+              <div
+                key={mod.id}
+                className={`p-4 space-y-3 transition ${
+                  mod.id === "mod-02" ? "bg-primary/5" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-primary">
+                        {mod.code}
+                      </span>
+                      {mod.id === "mod-02" && (
+                        <span className="text-[10px] bg-primary-container text-on-primary-container px-2 py-0.5 rounded-full font-mono font-semibold">
+                          Aktif
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs font-semibold text-on-surface mt-0.5">
+                      {mod.title}
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container/60 text-on-primary-container text-[10px] font-mono shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary"></span> Siap
+                  </span>
+                </div>
+
+                <div className="text-[11px] text-on-surface-variant font-mono flex items-center justify-between">
+                  <span>{mod.learningActivitiesCount} Topik • {mod.totalPages} Halaman</span>
+                  <span>{mod.masteryPercent}% Penguasaan</span>
+                </div>
+
+                <div className="w-full bg-surface-variant h-2 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${
+                      mod.status === "MASTERED"
+                        ? "bg-primary"
+                        : mod.status === "IN_PROGRESS"
+                        ? "bg-primary"
+                        : mod.status === "NEEDS_REVIEW"
+                        ? "bg-amber-400"
+                        : "bg-error"
+                    }`}
+                    style={{ width: `${mod.masteryPercent}%` }}
+                  ></div>
+                </div>
+
+                <div className="pt-1">
+                  <Link
+                    href={`/learning/${mod.id}`}
+                    className="w-full py-2 px-3 rounded-full bg-surface-container-high hover:bg-surface-variant text-on-surface border border-outline-variant text-xs font-medium transition flex items-center justify-center gap-1.5"
+                  >
+                    <span>Buka Ruang Belajar</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-primary" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Varian Tampilan Desktop: Table */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-surface-container-high/60 border-b border-outline-variant text-on-surface-variant font-mono">
                 <tr>
