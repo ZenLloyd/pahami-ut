@@ -24,25 +24,25 @@ export default function AdminDashboardPage() {
   const [rentangHari, setRentangHari] = useState<"7" | "30">("7");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Mock Data Pengguna Terbaru (Sesuai Dokumen S-14)
+  // Mock Data Pengguna Terbaru
   const penggunaTerbaru = [
     {
-      nama: "Muhammad Latif",
+      nama: "Abdurahman Ghozali",
       email: "mahasiswa@ecampus.ut.ac.id",
       bergabung: "8 Okt 2026",
       dokumen: 4,
       status: "Aktif",
     },
     {
-      nama: "Oktavina Putri",
-      email: "oktavina@ecampus.ut.ac.id",
+      nama: "Anisa Putri",
+      email: "anisaputri@ecampus.ut.ac.id",
       bergabung: "8 Okt 2026",
       dokumen: 5,
       status: "Aktif",
     },
     {
-      nama: "Wasil PM",
-      email: "wasil@ecampus.ut.ac.id",
+      nama: "Joko Susilo",
+      email: "josusilo@ecampus.ut.ac.id",
       bergabung: "7 Okt 2026",
       dokumen: 3,
       status: "Aktif",
@@ -131,21 +131,19 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-2 bg-surface-container-high p-1 rounded-full border border-outline-variant text-xs">
             <button
               onClick={() => setRentangHari("7")}
-              className={`px-3 py-1 rounded-full transition cursor-pointer ${
-                rentangHari === "7"
-                  ? "bg-primary text-on-primary font-semibold"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
+              className={`px-3 py-1 rounded-full transition cursor-pointer ${rentangHari === "7"
+                ? "bg-primary text-on-primary font-semibold"
+                : "text-on-surface-variant hover:text-on-surface"
+                }`}
             >
               7 Hari Terakhir
             </button>
             <button
               onClick={() => setRentangHari("30")}
-              className={`px-3 py-1 rounded-full transition cursor-pointer ${
-                rentangHari === "30"
-                  ? "bg-primary text-on-primary font-semibold"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
+              className={`px-3 py-1 rounded-full transition cursor-pointer ${rentangHari === "30"
+                ? "bg-primary text-on-primary font-semibold"
+                : "text-on-surface-variant hover:text-on-surface"
+                }`}
             >
               30 Hari Terakhir
             </button>
@@ -305,16 +303,14 @@ export default function AdminDashboardPage() {
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium ${
-                          p.status === "Aktif"
-                            ? "bg-primary-container text-on-primary-container"
-                            : "bg-error/15 text-error"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium ${p.status === "Aktif"
+                          ? "bg-primary-container text-on-primary-container"
+                          : "bg-error/15 text-error"
+                          }`}
                       >
                         <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            p.status === "Aktif" ? "bg-primary" : "bg-error"
-                          }`}
+                          className={`w-1.5 h-1.5 rounded-full ${p.status === "Aktif" ? "bg-primary" : "bg-error"
+                            }`}
                         ></span>
                         {p.status}
                       </span>

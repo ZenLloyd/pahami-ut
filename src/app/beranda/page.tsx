@@ -24,7 +24,7 @@ export default function BerandaMahasiswaPage() {
           <div>
             <div className="text-xs font-mono text-primary mb-1 flex items-center gap-1.5">
               <GraduationCap className="w-4 h-4" />
-              <span>Halo, Latif! Selamat belajar mandiri hari ini.</span>
+              <span>Halo, Ghozali! Selamat belajar mandiri hari ini.</span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-on-surface">
               Beranda Mahasiswa
@@ -179,9 +179,8 @@ export default function BerandaMahasiswaPage() {
             {mockModules.map((mod) => (
               <div
                 key={mod.id}
-                className={`p-4 space-y-3 transition ${
-                  mod.id === "mod-02" ? "bg-primary/5" : ""
-                }`}
+                className={`p-4 space-y-3 transition ${mod.id === "mod-02" ? "bg-primary/5" : ""
+                  }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
@@ -211,15 +210,14 @@ export default function BerandaMahasiswaPage() {
 
                 <div className="w-full bg-surface-variant h-2 rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full ${
-                      mod.status === "MASTERED"
+                    className={`h-full rounded-full ${mod.status === "MASTERED"
                         ? "bg-primary"
                         : mod.status === "IN_PROGRESS"
-                        ? "bg-primary"
-                        : mod.status === "NEEDS_REVIEW"
-                        ? "bg-amber-400"
-                        : "bg-error"
-                    }`}
+                          ? "bg-primary"
+                          : mod.status === "NEEDS_REVIEW"
+                            ? "bg-amber-400"
+                            : "bg-error"
+                      }`}
                     style={{ width: `${mod.masteryPercent}%` }}
                   ></div>
                 </div>
@@ -253,11 +251,10 @@ export default function BerandaMahasiswaPage() {
                 {mockModules.map((mod) => (
                   <tr
                     key={mod.id}
-                    className={`transition ${
-                      mod.id === "mod-02"
+                    className={`transition ${mod.id === "mod-02"
                         ? "bg-primary/5 hover:bg-primary/10"
                         : "hover:bg-surface-container-high/50"
-                    }`}
+                      }`}
                   >
                     <td className="py-3.5 px-4 font-mono font-medium text-primary">
                       {mod.code}
@@ -279,15 +276,14 @@ export default function BerandaMahasiswaPage() {
                       <div className="flex items-center gap-2">
                         <div className="flex-1 bg-surface-variant h-2 rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full ${
-                              mod.status === "MASTERED"
+                            className={`h-full rounded-full ${mod.status === "MASTERED"
                                 ? "bg-primary"
                                 : mod.status === "IN_PROGRESS"
-                                ? "bg-primary"
-                                : mod.status === "NEEDS_REVIEW"
-                                ? "bg-amber-400"
-                                : "bg-error"
-                            }`}
+                                  ? "bg-primary"
+                                  : mod.status === "NEEDS_REVIEW"
+                                    ? "bg-amber-400"
+                                    : "bg-error"
+                              }`}
                             style={{ width: `${mod.masteryPercent}%` }}
                           ></div>
                         </div>

@@ -18,7 +18,7 @@ const STORAGE_KEY_SESSION = "pahami_session";
 // Data Awal Bawaan Sistem
 const DEFAULT_USERS: Pengguna[] = [
   {
-    nama: "Muhammad Latif",
+    nama: "Abdurahman Ghozali",
     email: "mahasiswa@ecampus.ut.ac.id",
     kataSandi: "rahasia123",
     role: "mahasiswa",

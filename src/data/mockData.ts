@@ -1,7 +1,7 @@
 import { StudentProfile, WeakTopic, ModuleMastery, AICitation, ChatMessage } from "@/types";
 
 export const mockStudent: StudentProfile = {
-  name: "Latif K.",
+  name: "A. Ghozali",
   nim: "043819281",
   programStudi: "Sistem Informasi (S1)",
   semester: "2026.1 (Ganjil)",

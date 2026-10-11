@@ -173,12 +173,11 @@ export default function DaftarPage() {
               value={nama}
               onChange={(e) => setNama(e.target.value)}
               onBlur={() => validasiKolom("nama")}
-              placeholder="Contoh: Muhammad Latif"
-              className={`w-full px-3.5 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${
-                errors.nama
+              placeholder="Contoh: Abdurahman Ghozali"
+              className={`w-full px-3.5 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${errors.nama
                   ? "border-error focus:border-error"
                   : "border-outline-variant focus:border-primary"
-              }`}
+                }`}
             />
             {errors.nama && (
               <p className="text-[11px] text-error mt-1 flex items-center gap-1 font-mono">
@@ -199,11 +198,10 @@ export default function DaftarPage() {
               onChange={(e) => setEmail(e.target.value)}
               onBlur={() => validasiKolom("email")}
               placeholder="nama@ecampus.ut.ac.id"
-              className={`w-full px-3.5 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${
-                errors.email
+              className={`w-full px-3.5 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${errors.email
                   ? "border-error focus:border-error"
                   : "border-outline-variant focus:border-primary"
-              }`}
+                }`}
             />
             {errors.email && (
               <p className="text-[11px] text-error mt-1 flex items-center gap-1 font-mono">
@@ -225,11 +223,10 @@ export default function DaftarPage() {
                 onChange={(e) => setKataSandi(e.target.value)}
                 onBlur={() => validasiKolom("kataSandi")}
                 placeholder="Minimal 8 karakter kombinasi huruf & angka"
-                className={`w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${
-                  errors.kataSandi
+                className={`w-full pl-3.5 pr-10 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${errors.kataSandi
                     ? "border-error focus:border-error"
                     : "border-outline-variant focus:border-primary"
-                }`}
+                  }`}
               />
               <button
                 type="button"
@@ -245,24 +242,20 @@ export default function DaftarPage() {
               <div className="mt-2 space-y-1">
                 <div className="grid grid-cols-4 gap-1 h-1.5">
                   <div
-                    className={`rounded-full transition ${
-                      kekuatan >= 1 ? "bg-error" : "bg-surface-variant"
-                    }`}
+                    className={`rounded-full transition ${kekuatan >= 1 ? "bg-error" : "bg-surface-variant"
+                      }`}
                   />
                   <div
-                    className={`rounded-full transition ${
-                      kekuatan >= 2 ? "bg-amber-400" : "bg-surface-variant"
-                    }`}
+                    className={`rounded-full transition ${kekuatan >= 2 ? "bg-amber-400" : "bg-surface-variant"
+                      }`}
                   />
                   <div
-                    className={`rounded-full transition ${
-                      kekuatan >= 3 ? "bg-primary-container" : "bg-surface-variant"
-                    }`}
+                    className={`rounded-full transition ${kekuatan >= 3 ? "bg-primary-container" : "bg-surface-variant"
+                      }`}
                   />
                   <div
-                    className={`rounded-full transition ${
-                      kekuatan >= 4 ? "bg-primary" : "bg-surface-variant"
-                    }`}
+                    className={`rounded-full transition ${kekuatan >= 4 ? "bg-primary" : "bg-surface-variant"
+                      }`}
                   />
                 </div>
                 <div className="flex justify-between text-[10px] text-on-surface-variant font-mono">
@@ -271,10 +264,10 @@ export default function DaftarPage() {
                     {kekuatan <= 1
                       ? "Sangat Lemah"
                       : kekuatan === 2
-                      ? "Sedang"
-                      : kekuatan === 3
-                      ? "Cukup Baik"
-                      : "Sangat Kuat"}
+                        ? "Sedang"
+                        : kekuatan === 3
+                          ? "Cukup Baik"
+                          : "Sangat Kuat"}
                   </span>
                 </div>
               </div>
@@ -299,11 +292,10 @@ export default function DaftarPage() {
               onChange={(e) => setKonfirmasiSandi(e.target.value)}
               onBlur={() => validasiKolom("konfirmasiSandi")}
               placeholder="Ulangi kata sandi"
-              className={`w-full px-3.5 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${
-                errors.konfirmasiSandi
+              className={`w-full px-3.5 py-2.5 rounded-xl bg-surface border text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none transition ${errors.konfirmasiSandi
                   ? "border-error focus:border-error"
                   : "border-outline-variant focus:border-primary"
-              }`}
+                }`}
             />
             {errors.konfirmasiSandi && (
               <p className="text-[11px] text-error mt-1 flex items-center gap-1 font-mono">
