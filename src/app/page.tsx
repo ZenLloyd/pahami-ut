@@ -15,8 +15,8 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans selection:bg-primary-container selection:text-on-primary-container">
       {/* 1. NAVIGASI ATAS */}
-      <header className="h-16 border-b border-outline-variant bg-surface/90 backdrop-blur sticky top-0 z-50 px-6 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
+      <header className="h-16 border-b border-outline-variant bg-surface/90 backdrop-blur sticky top-0 z-50 px-4 sm:px-6 flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold flex items-center justify-center text-sm tracking-tighter shadow-sm">
             UT
           </div>
@@ -28,17 +28,17 @@ export default function LandingPage() {
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
           <Link
             href="/masuk"
-            className="px-4 py-2 text-xs text-on-surface hover:text-primary transition font-medium"
+            className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs text-on-surface hover:text-primary transition font-medium"
           >
             Masuk
           </Link>
           <Link
             href="/daftar"
-            className="px-4 py-2 rounded-full bg-primary hover:opacity-90 text-on-primary font-semibold text-xs transition shadow-sm"
+            className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary hover:opacity-90 text-on-primary font-semibold text-xs transition shadow-sm"
           >
             Mulai Gratis ↗
           </Link>
