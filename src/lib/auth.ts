@@ -14,6 +14,8 @@ export interface Pengguna {
 
 const STORAGE_KEY_USERS = "pahami_users_db";
 const STORAGE_KEY_SESSION = "pahami_session";
+const STORAGE_KEY_VERSION = "pahami_db_version";
+const DB_VERSION = "v2_budsant";
 
 // Data Awal Bawaan Sistem
 const DEFAULT_USERS: Pengguna[] = [
@@ -46,10 +48,30 @@ const DEFAULT_USERS: Pengguna[] = [
 export function getDaftarPengguna(): Pengguna[] {
   if (typeof window === "undefined") return DEFAULT_USERS;
   try {
+    const currentVersion = localStorage.getItem(STORAGE_KEY_VERSION);
     const raw = localStorage.getItem(STORAGE_KEY_USERS);
-    if (!raw) {
-      localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(DEFAULT_USERS));
-      return DEFAULT_USERS;
+
+    if (!raw || currentVersion !== DB_VERSION) {
+      let users: Pengguna[] = DEFAULT_USERS;
+      if (raw) {
+        try {
+          const existing: Pengguna[] = JSON.parse(raw);
+          // Pertahankan akun baru yang pernah didaftarkan user sendiri
+          const customUsers = existing.filter(
+            (u) =>
+              u.email.toLowerCase() !== "mahasiswa@ecampus.ut.ac.id" &&
+              u.email.toLowerCase() !== "nonaktif@ecampus.ut.ac.id" &&
+              u.email.toLowerCase() !== "budsant@ecampus.ut.ac.id" &&
+              u.email.toLowerCase() !== "admin@ecampus.ut.ac.id"
+          );
+          users = [...DEFAULT_USERS, ...customUsers];
+        } catch {
+          users = DEFAULT_USERS;
+        }
+      }
+      localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+      localStorage.setItem(STORAGE_KEY_VERSION, DB_VERSION);
+      return users;
     }
     return JSON.parse(raw);
   } catch {
