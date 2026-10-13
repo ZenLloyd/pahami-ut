@@ -21,24 +21,64 @@ import {
   Maximize2,
   Trash2,
   MessageSquare,
+  CheckCircle,
+  FileText,
 } from "lucide-react";
+import { getDokumenById, type DokumenUpload } from "@/lib/dokumen";
+import { useEffect } from "react";
 
 export function LearningRoomClient({ moduleId }: { moduleId: string }) {
   const [zoom, setZoom] = useState(100);
   const [viewMode, setViewMode] = useState<"split" | "reader">("split");
   const [mobileTab, setMobileTab] = useState<"materi" | "ai">("materi");
+  const [uploadedDoc, setUploadedDoc] = useState<DokumenUpload | null>(null);
+  const [activeTopicIndex, setActiveTopicIndex] = useState(0);
+
   const [messages, setMessages] = useState<ChatMessage[]>(mockInitialMessages);
   const [inputPrompt, setInputPrompt] = useState("");
 
   const citationTargetRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    // Cek apakah moduleId merujuk pada dokumen yang di-upload
+    const doc = getDokumenById(moduleId);
+    if (doc) {
+      setUploadedDoc(doc);
+      // Buat percakapan awal yang relevan dengan dokumen yang di-upload
+      const topikAwal = doc.topik[0];
+      const ringkasanTeks = topikAwal?.ringkasan && topikAwal.ringkasan.length > 0
+        ? topikAwal.ringkasan.join(" ")
+        : "Dokumen ini berhasil diproses dan siap ditanyakan.";
+
+      setMessages([
+        {
+          id: "msg-welcome",
+          sender: "ai",
+          text: `Halo! Saya asisten AI untuk dokumen **${doc.judul}**.\n\nBerikut ringkasan inti untuk ${topikAwal?.judul || "Kegiatan Belajar 1"} (Hal. ${topikAwal?.halamanMulai || 1}–${topikAwal?.halamanAkhir || doc.totalHalaman}):\n\n${ringkasanTeks}\n\nSilakan tanyakan hal apa pun seputar modul ini!`,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          citations: [
+            {
+              id: "cit-init",
+              moduleId: doc.id,
+              moduleCode: doc.judul,
+              page: topikAwal?.halamanMulai || 1,
+              snippet: topikAwal?.ringkasan?.[0] || doc.judul,
+            },
+          ],
+          suggestedFollowups: topikAwal?.kataKunci && topikAwal.kataKunci.length > 0
+            ? topikAwal.kataKunci.slice(0, 3).map((k) => `Jelaskan lebih detail tentang ${k}`)
+            : ["Rangkumkan poin-poin utama kegiatan belajar ini"],
+        },
+      ]);
+    }
+  }, [moduleId]);
+
   const handleZoom = (delta: number) => {
     setZoom((prev) => Math.min(Math.max(prev + delta, 70), 160));
   };
 
   const handleCitationClick = () => {
-    // Di layar HP: otomatis pindah ke tab materi dan fokuskan kutipan
     setMobileTab("materi");
     setTimeout(() => {
       if (citationTargetRef.current) {
@@ -68,30 +108,58 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
     };
 
     setMessages((prev) => [...prev, userMsg]);
+    const currentInput = inputPrompt;
     setInputPrompt("");
 
     setTimeout(() => {
-      const aiReply: ChatMessage = {
-        id: `msg-${Date.now() + 1}`,
-        sender: "ai",
-        text: `Berdasarkan Modul 02 BMP Struktur Data (Halaman 14–16), pertanyaanmu berkaitan dengan batas kapasitas stack. Operasi push harus selalu memeriksa apakah batas memori penuh (overflow check) sebelum menambahkan elemen baru guna mencegah kegagalan sistem.`,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        citations: [
-          {
-            id: `cit-${Date.now()}`,
-            moduleId: moduleId,
-            moduleCode: "Modul 02",
-            page: 14,
-            snippet:
-              "Karakteristik utama Stack adalah kepatuhan terhadap aturan Last In, First Out (LIFO)...",
-          },
-        ],
-        suggestedFollowups: ["Bagaimana penanganan underflow pada operasi pop()?"],
-      };
-      setMessages((prev) => [...prev, aiReply]);
+      if (uploadedDoc) {
+        const currentTopic = uploadedDoc.topik[activeTopicIndex] || uploadedDoc.topik[0];
+        const ringkasanSnippet = currentTopic?.ringkasan?.[0] || "Pembahasan materi terkait konsep modul.";
+        const aiReply: ChatMessage = {
+          id: `msg-${Date.now() + 1}`,
+          sender: "ai",
+          text: `Berdasarkan dokumen **${uploadedDoc.judul}** pada ${currentTopic?.judul || "Kegiatan Belajar"} (Halaman ${currentTopic?.halamanMulai || 1}–${currentTopic?.halamanAkhir || uploadedDoc.totalHalaman}):\n\nUntuk pertanyaan *"${currentInput}"*, materi dalam dokumen menekankan: ${ringkasanSnippet}\n\n*(Catatan: RAG live pipeline saat ini membaca ringkasan ekstraktif dari teks PDF Anda)*.`,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          citations: [
+            {
+              id: `cit-${Date.now()}`,
+              moduleId: uploadedDoc.id,
+              moduleCode: uploadedDoc.judul,
+              page: currentTopic?.halamanMulai || 1,
+              snippet: ringkasanSnippet,
+            },
+          ],
+          suggestedFollowups: currentTopic?.kataKunci?.slice(0, 2).map((k) => `Apa relevansi ${k}?`) || [
+            "Lanjut ke topik berikutnya",
+          ],
+        };
+        setMessages((prev) => [...prev, aiReply]);
+      } else {
+        const aiReply: ChatMessage = {
+          id: `msg-${Date.now() + 1}`,
+          sender: "ai",
+          text: `Berdasarkan Modul 02 BMP Struktur Data (Halaman 14–16), pertanyaanmu berkaitan dengan batas kapasitas stack. Operasi push harus selalu memeriksa apakah batas memori penuh (overflow check) sebelum menambahkan elemen baru guna mencegah kegagalan sistem.`,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          citations: [
+            {
+              id: `cit-${Date.now()}`,
+              moduleId: moduleId,
+              moduleCode: "Modul 02",
+              page: 14,
+              snippet:
+                "Karakteristik utama Stack adalah kepatuhan terhadap aturan Last In, First Out (LIFO)...",
+            },
+          ],
+          suggestedFollowups: ["Bagaimana penanganan underflow pada operasi pop()?"],
+        };
+        setMessages((prev) => [...prev, aiReply]);
+      }
     }, 700);
   };
 
@@ -118,11 +186,25 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
               Beranda
             </Link>
             <span className="hidden sm:inline">/</span>
-            <span className="truncate">MSIM4201</span>
-            <span>/</span>
-            <span className="text-on-surface font-medium bg-surface-container-high px-2 py-0.5 rounded border border-outline-variant truncate">
-              Modul 02: KB 1
-            </span>
+            {uploadedDoc ? (
+              <>
+                <Link href={`/dokumen/${uploadedDoc.id}`} className="hover:text-on-surface truncate">
+                  {uploadedDoc.namaFile}
+                </Link>
+                <span>/</span>
+                <span className="text-on-surface font-medium bg-surface-container-high px-2 py-0.5 rounded border border-outline-variant truncate">
+                  {uploadedDoc.topik[activeTopicIndex]?.judul || "Kegiatan Belajar"}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="truncate">MSIM4201</span>
+                <span>/</span>
+                <span className="text-on-surface font-medium bg-surface-container-high px-2 py-0.5 rounded border border-outline-variant truncate">
+                  Modul 02: KB 1
+                </span>
+              </>
+            )}
           </nav>
         </div>
 
@@ -201,23 +283,45 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
             <div className="flex items-center gap-2 sm:gap-3 truncate">
               <span className="text-xs font-medium text-on-surface flex items-center gap-1.5 truncate">
                 <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
-                <span className="truncate">MSIM4201_Modul_02.pdf</span>
+                <span className="truncate">
+                  {uploadedDoc ? uploadedDoc.namaFile : "MSIM4201_Modul_02.pdf"}
+                </span>
               </span>
               <span className="text-[11px] text-on-surface-variant font-mono bg-surface border border-outline-variant px-1.5 py-0.5 rounded shrink-0">
-                Hal. 14 / 84
+                {uploadedDoc
+                  ? `Hal. ${uploadedDoc.topik[activeTopicIndex]?.halamanMulai || 1} / ${uploadedDoc.totalHalaman}`
+                  : "Hal. 14 / 84"}
               </span>
             </div>
 
             <div className="flex items-center gap-1 shrink-0">
               <button
-                className="p-1.5 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-variant transition"
-                title="Halaman Sebelumnya"
+                onClick={() => {
+                  if (uploadedDoc) {
+                    setActiveTopicIndex((prev) => Math.max(0, prev - 1));
+                  }
+                }}
+                disabled={uploadedDoc ? activeTopicIndex === 0 : false}
+                className="p-1.5 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-variant transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                title="Kegiatan Belajar Sebelumnya"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
               <button
-                className="p-1.5 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-variant transition"
-                title="Halaman Berikutnya"
+                onClick={() => {
+                  if (uploadedDoc) {
+                    setActiveTopicIndex((prev) =>
+                      Math.min(uploadedDoc.topik.length - 1, prev + 1)
+                    );
+                  }
+                }}
+                disabled={
+                  uploadedDoc
+                    ? activeTopicIndex >= uploadedDoc.topik.length - 1
+                    : false
+                }
+                className="p-1.5 text-on-surface-variant hover:text-on-surface rounded hover:bg-surface-variant transition disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                title="Kegiatan Belajar Berikutnya"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -271,77 +375,151 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
               style={{ zoom: `${zoom}%` }}
               className="max-w-2xl mx-auto bg-surface-container border border-outline-variant rounded-2xl p-6 sm:p-8 md:p-10 shadow-xl text-on-surface leading-relaxed font-sans select-text transition-all duration-150 my-2"
             >
-              {/* Document Header */}
-              <div className="border-b border-outline-variant pb-4 mb-6">
-                <div className="text-[11px] font-mono tracking-wider text-primary uppercase font-semibold">
-                  Kegiatan Belajar 1
-                </div>
-                <h1 className="text-lg sm:text-xl font-bold text-on-surface tracking-tight mt-1">
-                  Konsep Dasar Stack (Tumpukan) & Prinsip LIFO
-                </h1>
-                <p className="text-xs text-on-surface-variant font-mono mt-1">
-                  Buku Materi Pokok UT • MSIM4201 / Modul 2 / Halaman 14
-                </p>
-              </div>
-
-              {/* Content Paragraphs */}
-              <p className="mb-4 text-xs sm:text-[13px] leading-6 text-on-surface">
-                Secara konseptual,{" "}
-                <strong className="text-primary font-semibold">
-                  Stack (tumpukan)
-                </strong>{" "}
-                adalah struktur data linear di mana penambahan elemen baru dan
-                penghapusan elemen selalu dilakukan pada satu ujung yang sama,
-                yang dikenal sebagai bagian atas (<em>top of stack</em>).
-              </p>
-
-              {/* Highlight Target for AI Citation */}
-              <div
-                ref={citationTargetRef}
-                className="p-3.5 my-4 rounded-xl border border-primary/30 bg-primary/10 text-on-surface transition-all duration-300"
-              >
-                <div className="flex items-center gap-1.5 text-[11px] text-primary font-mono font-medium mb-1">
-                  <span>📌</span> Rujukan Resmi Modul — Halaman 14 Paragraf 3:
-                </div>
-                <p className="text-xs sm:text-[13px] leading-6 italic text-on-surface">
-                  &quot;Karakteristik utama dari struktur Stack adalah
-                  kepatuhannya terhadap aturan{" "}
-                  <strong>Last In, First Out (LIFO)</strong>. Artinya, elemen
-                  yang paling terakhir dimasukkan ke dalam struktur memori adalah
-                  elemen pertama yang harus dikeluarkan saat operasi pop
-                  dipanggil.&quot;
-                </p>
-              </div>
-
-              <p className="mb-4 text-xs sm:text-[13px] leading-6 text-on-surface">
-                Operasi dasar pada stack mencakup dua operasi fundamental:
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                <div className="p-3 rounded-xl bg-surface border border-outline-variant">
-                  <div className="font-mono text-xs font-semibold text-primary">
-                    1. Operasi Push
+              {uploadedDoc ? (
+                <>
+                  {/* Document Header Uploaded */}
+                  <div className="border-b border-outline-variant pb-4 mb-6">
+                    <div className="text-[11px] font-mono tracking-wider text-primary uppercase font-semibold">
+                      {uploadedDoc.topik[activeTopicIndex]?.judul || `Kegiatan Belajar ${activeTopicIndex + 1}`}
+                    </div>
+                    <h1 className="text-lg sm:text-xl font-bold text-on-surface tracking-tight mt-1">
+                      {uploadedDoc.judul}
+                    </h1>
+                    <p className="text-xs text-on-surface-variant font-mono mt-1">
+                      {uploadedDoc.namaFile} • Hal. {uploadedDoc.topik[activeTopicIndex]?.halamanMulai || 1}–{uploadedDoc.topik[activeTopicIndex]?.halamanAkhir || uploadedDoc.totalHalaman} dari {uploadedDoc.totalHalaman}
+                    </p>
                   </div>
-                  <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
-                    Menambahkan elemen baru ke posisi paling atas tumpukan jika
-                    kapasitas memori belum penuh (overflow check).
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-surface border border-outline-variant">
-                  <div className="font-mono text-xs font-semibold text-primary">
-                    2. Operasi Pop
-                  </div>
-                  <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
-                    Mengambil atau menghapus elemen teratas dari tumpukan jika
-                    tumpukan tidak kosong (underflow check).
-                  </p>
-                </div>
-              </div>
 
-              <div className="border-t border-outline-variant pt-4 mt-8 flex items-center justify-between text-xs text-on-surface-variant font-mono">
-                <span>MSIM4201 / Modul 02</span>
-                <span>Halaman 14</span>
-              </div>
+                  {/* Highlight Target for AI Citation */}
+                  <div
+                    ref={citationTargetRef}
+                    className="p-3.5 my-4 rounded-xl border border-primary/30 bg-primary/10 text-on-surface transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-1.5 text-[11px] text-primary font-mono font-medium mb-1">
+                      <span>📌</span> Rujukan Inti Materi — Halaman {uploadedDoc.topik[activeTopicIndex]?.halamanMulai || 1}:
+                    </div>
+                    <p className="text-xs sm:text-[13px] leading-6 italic text-on-surface">
+                      &quot;{uploadedDoc.topik[activeTopicIndex]?.ringkasan?.[0] || "Materi pada kegiatan belajar ini membahas konsep dasar modul yang diunggah."}&quot;
+                    </p>
+                  </div>
+
+                  {/* Poin-Poin Ringkasan Otomatis dari Dokumen */}
+                  <div className="space-y-3 my-4">
+                    <h3 className="text-xs font-semibold text-primary uppercase font-mono tracking-wider">
+                      Inti Pembahasan Topik
+                    </h3>
+                    {uploadedDoc.topik[activeTopicIndex]?.ringkasan && uploadedDoc.topik[activeTopicIndex].ringkasan!.length > 0 ? (
+                      <ul className="space-y-2.5 list-disc pl-4 text-xs sm:text-[13px] leading-relaxed text-on-surface">
+                        {uploadedDoc.topik[activeTopicIndex].ringkasan!.map((point, idx) => (
+                          <li key={idx}>{point}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-xs text-on-surface-variant italic">
+                        Materi pada kegiatan belajar ini belum diekstrak kalimat intinya. Silakan tanyakan konsep spesifik melalui asisten AI di sebelah kanan.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Kata Kunci Relevan */}
+                  {uploadedDoc.topik[activeTopicIndex]?.kataKunci && uploadedDoc.topik[activeTopicIndex].kataKunci!.length > 0 && (
+                    <div className="mt-6 pt-4 border-t border-outline-variant/60">
+                      <div className="text-[11px] font-mono text-on-surface-variant mb-2">
+                        Konsep & Kata Kunci:
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {uploadedDoc.topik[activeTopicIndex].kataKunci!.map((w) => (
+                          <span
+                            key={w}
+                            className="text-[11px] font-mono px-2.5 py-1 rounded-full bg-surface border border-outline-variant text-primary font-medium"
+                          >
+                            #{w}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="border-t border-outline-variant pt-4 mt-8 flex items-center justify-between text-xs text-on-surface-variant font-mono">
+                    <span>{uploadedDoc.namaFile}</span>
+                    <span>Hal. {uploadedDoc.topik[activeTopicIndex]?.halamanMulai || 1}–{uploadedDoc.topik[activeTopicIndex]?.halamanAkhir || uploadedDoc.totalHalaman}</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Document Header Default Mock */}
+                  <div className="border-b border-outline-variant pb-4 mb-6">
+                    <div className="text-[11px] font-mono tracking-wider text-primary uppercase font-semibold">
+                      Kegiatan Belajar 1
+                    </div>
+                    <h1 className="text-lg sm:text-xl font-bold text-on-surface tracking-tight mt-1">
+                      Konsep Dasar Stack (Tumpukan) & Prinsip LIFO
+                    </h1>
+                    <p className="text-xs text-on-surface-variant font-mono mt-1">
+                      Buku Materi Pokok UT • MSIM4201 / Modul 2 / Halaman 14
+                    </p>
+                  </div>
+
+                  {/* Content Paragraphs */}
+                  <p className="mb-4 text-xs sm:text-[13px] leading-6 text-on-surface">
+                    Secara konseptual,{" "}
+                    <strong className="text-primary font-semibold">
+                      Stack (tumpukan)
+                    </strong>{" "}
+                    adalah struktur data linear di mana penambahan elemen baru dan
+                    penghapusan elemen selalu dilakukan pada satu ujung yang sama,
+                    yang dikenal sebagai bagian atas (<em>top of stack</em>).
+                  </p>
+
+                  {/* Highlight Target for AI Citation */}
+                  <div
+                    ref={citationTargetRef}
+                    className="p-3.5 my-4 rounded-xl border border-primary/30 bg-primary/10 text-on-surface transition-all duration-300"
+                  >
+                    <div className="flex items-center gap-1.5 text-[11px] text-primary font-mono font-medium mb-1">
+                      <span>📌</span> Rujukan Resmi Modul — Halaman 14 Paragraf 3:
+                    </div>
+                    <p className="text-xs sm:text-[13px] leading-6 italic text-on-surface">
+                      &quot;Karakteristik utama dari struktur Stack adalah
+                      kepatuhannya terhadap aturan{" "}
+                      <strong>Last In, First Out (LIFO)</strong>. Artinya, elemen
+                      yang paling terakhir dimasukkan ke dalam struktur memori adalah
+                      elemen pertama yang harus dikeluarkan saat operasi pop
+                      dipanggil.&quot;
+                    </p>
+                  </div>
+
+                  <p className="mb-4 text-xs sm:text-[13px] leading-6 text-on-surface">
+                    Operasi dasar pada stack mencakup dua operasi fundamental:
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+                    <div className="p-3 rounded-xl bg-surface border border-outline-variant">
+                      <div className="font-mono text-xs font-semibold text-primary">
+                        1. Operasi Push
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                        Menambahkan elemen baru ke posisi paling atas tumpukan jika
+                        kapasitas memori belum penuh (overflow check).
+                      </p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-surface border border-outline-variant">
+                      <div className="font-mono text-xs font-semibold text-primary">
+                        2. Operasi Pop
+                      </div>
+                      <p className="text-xs text-on-surface-variant mt-1 leading-relaxed">
+                        Mengambil atau menghapus elemen teratas dari tumpukan jika
+                        tumpukan tidak kosong (underflow check).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-outline-variant pt-4 mt-8 flex items-center justify-between text-xs text-on-surface-variant font-mono">
+                    <span>MSIM4201 / Modul 02</span>
+                    <span>Halaman 14</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -379,8 +557,8 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-[11px] text-on-surface-variant font-mono hidden sm:inline">
-                  Cakupan: Modul 02
+                <span className="text-[11px] text-on-surface-variant font-mono hidden sm:inline truncate max-w-[180px]">
+                  Cakupan: {uploadedDoc ? uploadedDoc.judul : "Modul 02"}
                 </span>
                 <button
                   onClick={() => setMessages([])}
@@ -507,7 +685,11 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                       handleSendMessage();
                     }
                   }}
-                  placeholder="Tanyakan materi dari Modul 2 ini... (misal: kondisi overflow)"
+                  placeholder={
+                    uploadedDoc
+                      ? `Tanyakan materi seputar ${uploadedDoc.judul}...`
+                      : "Tanyakan materi dari Modul 2 ini... (misal: kondisi overflow)"
+                  }
                   className="w-full bg-transparent text-xs text-on-surface placeholder-on-surface-variant/60 focus:outline-none resize-none leading-relaxed"
                 />
 
@@ -515,7 +697,10 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                   <div className="flex items-center gap-1.5 text-[11px] text-on-surface-variant">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                     <span className="font-mono text-[10px]">
-                      Filter: KB 1 (Hal 1–30)
+                      Filter:{" "}
+                      {uploadedDoc
+                        ? `${uploadedDoc.topik[activeTopicIndex]?.judul || "KB"} (Hal ${uploadedDoc.topik[activeTopicIndex]?.halamanMulai || 1}–${uploadedDoc.topik[activeTopicIndex]?.halamanAkhir || uploadedDoc.totalHalaman})`
+                        : "KB 1 (Hal 1–30)"}
                     </span>
                   </div>
 

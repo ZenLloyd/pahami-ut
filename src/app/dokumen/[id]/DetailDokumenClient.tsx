@@ -147,7 +147,7 @@ export function DetailDokumenClient() {
 
             <div className="flex flex-col sm:flex-row gap-2.5">
               <Link
-                href="/learning/mod-02"
+                href={`/learning/${dok.id}`}
                 className="min-h-12 px-6 rounded-full bg-primary text-on-primary font-semibold text-sm hover:opacity-90 transition inline-flex items-center justify-center gap-2"
               >
                 <BookOpen className="w-4 h-4" /> Buka Ruang Belajar <ArrowRight className="w-4 h-4" />

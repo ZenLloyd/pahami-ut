@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { DokumenUploadSection } from "@/components/DokumenUploadSection";
+import { StatistikBerandaSection } from "@/components/StatistikBerandaSection";
 import { mockWeakTopics, mockModules } from "@/data/mockData";
 import {
   AlertTriangle,
@@ -117,47 +118,7 @@ export default function BerandaMahasiswaPage() {
         </section>
 
         {/* 4 KARTU STATISTIK RESMI (BR-13 s.d. BR-15) */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-          <div className="p-4 rounded-2xl bg-surface-container border border-outline-variant">
-            <div className="text-xs font-mono text-on-surface-variant uppercase">Dokumen Tersimpan</div>
-            <div className="text-2xl font-bold font-mono tracking-tight text-on-surface mt-2">
-              4 <span className="text-sm font-normal text-on-surface-variant">/ 5 Kuota</span>
-            </div>
-            <div className="text-xs text-primary mt-1 font-mono">
-              BR-04: Maks 5 dokumen
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-surface-container border border-outline-variant">
-            <div className="text-xs font-mono text-on-surface-variant uppercase">Topik Selesai</div>
-            <div className="text-2xl font-bold font-mono tracking-tight text-primary mt-2">
-              10 <span className="text-sm font-normal text-on-surface-variant">/ 14 Topik</span>
-            </div>
-            <div className="text-xs text-on-surface-variant mt-1 font-mono">
-              Skor kuis ≥ 70
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-surface-container border border-outline-variant">
-            <div className="text-xs font-mono text-on-surface-variant uppercase">Rata-rata Skor</div>
-            <div className="text-2xl font-bold font-mono tracking-tight text-on-surface mt-2">
-              78.4 <span className="text-sm font-normal text-on-surface-variant">/ 100</span>
-            </div>
-            <div className="text-xs text-on-surface-variant mt-1 font-mono">
-              Batas Aman UT: ≥ 70
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-surface-container border border-outline-variant">
-            <div className="text-xs font-mono text-on-surface-variant uppercase">Topik Perlu Diulang</div>
-            <div className="text-2xl font-bold font-mono tracking-tight text-amber-300 mt-2">
-              2 Topik
-            </div>
-            <div className="text-xs text-on-surface-variant mt-1 font-mono">
-              Akurasi &lt; 60%
-            </div>
-          </div>
-        </section>
+        <StatistikBerandaSection />
 
         <DokumenUploadSection />
 
