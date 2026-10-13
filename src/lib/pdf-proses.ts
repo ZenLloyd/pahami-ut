@@ -106,7 +106,7 @@ function deteksiBatasTopik(
   return urut.length > 15 ? urut.slice(0, 15) : urut;
 }
 
-function rangkum(teks: string): { ringkasan: string[]; kataKunci: string[] } {
+function rangkum(teks: string): { ringkasan: string[]; kataKunci: string[]; kalimatLatihan: string[] } {
   const kalimat = teks
     .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
     .map((k) => k.trim())
@@ -134,5 +134,7 @@ function rangkum(teks: string): { ringkasan: string[]; kataKunci: string[] } {
     .sort((a, b) => a.i - b.i)
     .map((x) => x.k);
 
-  return { ringkasan, kataKunci };
+  const kalimatLatihan = kalimat.filter((k) => k.length >= 60).slice(0, 12);
+
+  return { ringkasan, kataKunci, kalimatLatihan };
 }

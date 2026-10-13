@@ -105,6 +105,7 @@ export function DetailDokumenClient() {
                           </div>
                           <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full shrink-0 ${st.kelas}`}>
                             {st.teks}
+                            {t.skorTerakhir !== undefined ? ` • ${t.skorTerakhir}` : ""}
                           </span>
                           <ChevronDown className="w-4 h-4 text-on-surface-variant shrink-0 transition group-open:rotate-180" />
                         </summary>

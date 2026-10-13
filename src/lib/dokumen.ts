@@ -15,6 +15,8 @@ export interface TopikDokumen {
   status: "BELUM" | "BERJALAN" | "SELESAI";
   ringkasan?: string[];
   kataKunci?: string[];
+  kalimatLatihan?: string[];
+  skorTerakhir?: number;
 }
 
 export interface DokumenUpload {
@@ -118,6 +120,17 @@ export function ubahStatusTopik(dokId: string, topikId: string, status: TopikDok
   const dok = semua.find((d) => d.id === dokId);
   if (!dok) return null;
   dok.topik = dok.topik.map((t) => (t.id === topikId ? { ...t, status } : t));
+  localStorage.setItem(KEY, JSON.stringify(semua));
+  return dok;
+}
+
+export function simpanSkorTopik(dokId: string, topikId: string, skor: number): DokumenUpload | null {
+  const semua = getDokumenUpload();
+  const dok = semua.find((d) => d.id === dokId);
+  if (!dok) return null;
+  dok.topik = dok.topik.map((t) =>
+    t.id === topikId ? { ...t, skorTerakhir: skor, status: skor >= 70 ? 'SELESAI' : 'BERJALAN' } : t,
+  );
   localStorage.setItem(KEY, JSON.stringify(semua));
   return dok;
 }

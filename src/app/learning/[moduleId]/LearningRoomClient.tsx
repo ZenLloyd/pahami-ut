@@ -470,6 +470,20 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                   </div>
 
                   {uploadedDoc.topik[activeTopicIndex] && (
+                    <Link
+                      href={`/latihan/${uploadedDoc.id}/${uploadedDoc.topik[activeTopicIndex].id}`}
+                      className="mt-4 w-full min-h-12 rounded-full bg-primary text-on-primary text-sm font-semibold inline-flex items-center justify-center gap-2 hover:opacity-90 transition"
+                    >
+                      Mulai Latihan 5 Soal
+                      {uploadedDoc.topik[activeTopicIndex].skorTerakhir !== undefined && (
+                        <span className="text-[11px] font-mono opacity-80">
+                          (skor terakhir {uploadedDoc.topik[activeTopicIndex].skorTerakhir})
+                        </span>
+                      )}
+                    </Link>
+                  )}
+
+                  {uploadedDoc.topik[activeTopicIndex] && (
                     <button
                       onClick={() => {
                         const t = uploadedDoc.topik[activeTopicIndex];
