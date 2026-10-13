@@ -177,15 +177,66 @@ export function LatihanClient() {
               {diperiksa && (
                 <div
                   role="status"
-                  className={`rounded-2xl p-4 text-xs leading-relaxed space-y-1 ${
-                    pilih === s.indexBenar ? "bg-primary/10" : "bg-error-container/20"
+                  className={`rounded-2xl p-4.5 text-xs leading-relaxed space-y-3 border ${
+                    pilih === s.indexBenar
+                      ? "bg-primary/10 border-primary/30"
+                      : "bg-error-container/20 border-error/30"
                   }`}
                 >
-                  <p className="font-semibold text-sm">
-                    {pilih === s.indexBenar ? "Benar!" : `Kurang tepat. Jawabannya: ${s.pilihan[s.indexBenar]}`}
-                  </p>
-                  <p className="text-on-surface-variant">Pembahasan (kalimat asli modul, {s.halaman}):</p>
-                  <p className="italic">&quot;{s.kalimatAsli}&quot;</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-bold text-sm flex items-center gap-1.5">
+                      {pilih === s.indexBenar ? (
+                        <>
+                          <Check className="w-4 h-4 text-primary" />
+                          <span className="text-primary">Jawabanmu Benar!</span>
+                        </>
+                      ) : (
+                        <>
+                          <X className="w-4 h-4 text-error" />
+                          <span className="text-error">Jawabanmu Kurang Tepat</span>
+                        </>
+                      )}
+                    </p>
+                    <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant">
+                      Rujukan: {s.halaman}
+                    </span>
+                  </div>
+
+                  {/* Penjelasan Pilihan Terpilih */}
+                  <div className="p-3 rounded-xl bg-surface/80 border border-outline-variant/60 space-y-1">
+                    <p className="font-semibold text-on-surface">
+                      Penjelasan Pilihan:
+                    </p>
+                    <p className="text-on-surface leading-relaxed">
+                      {pilih !== null && s.penjelasanOpsi?.[s.pilihan[pilih]]
+                        ? s.penjelasanOpsi[s.pilihan[pilih]]
+                        : s.penjelasan}
+                    </p>
+                  </div>
+
+                  {/* Kutipan Asli Buku / Pembahasan */}
+                  <div className="space-y-1">
+                    <p className="text-on-surface-variant font-mono text-[11px]">
+                      📖 Konteks Pembahasan dalam Modul ({s.halaman}):
+                    </p>
+                    <p className="italic text-on-surface bg-surface-container-high/50 p-2.5 rounded-xl border border-outline-variant/40">
+                      &quot;{s.kalimatAsli}&quot;
+                    </p>
+                  </div>
+
+                  {/* Tombol Tanya AI bila salah/bingung (Sesuai Panduan S-09) */}
+                  <div className="pt-1 flex items-center justify-between gap-2 flex-wrap">
+                    <span className="text-[11px] text-on-surface-variant">
+                      Masih belum paham materi ini?
+                    </span>
+                    <Link
+                      href={`${kembali}?tanya=${encodeURIComponent(`Jelaskan konsep soal ini dari modul: "${s.kalimatAsli}"`)}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-primary border border-primary/30 font-semibold text-[11px] transition"
+                    >
+                      <span>💡 Tanya Asisten AI</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
                 </div>
               )}
 
@@ -269,6 +320,11 @@ export function LatihanClient() {
                         <span>Kunci: <strong className="text-primary">{r.soal.pilihan[r.soal.indexBenar]}</strong></span>
                       )}
                       <span>({r.soal.halaman})</span>
+                    </div>
+                    {/* Penjelasan per butir soal di tinjauan */}
+                    <div className="p-2.5 rounded-xl bg-surface-container-high/60 text-[11px] text-on-surface-variant leading-relaxed">
+                      <span className="font-semibold text-on-surface">Penjelasan: </span>
+                      {r.soal.penjelasanOpsi?.[r.soal.pilihan[r.indexPilihan]] || r.soal.penjelasan}
                     </div>
                   </div>
                 ))}

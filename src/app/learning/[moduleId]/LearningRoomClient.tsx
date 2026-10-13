@@ -27,7 +27,10 @@ import {
 import { getDokumenById, ubahStatusTopik, type DokumenUpload } from "@/lib/dokumen";
 import { useEffect } from "react";
 
+import { useSearchParams } from "next/navigation";
+
 export function LearningRoomClient({ moduleId }: { moduleId: string }) {
+  const searchParams = useSearchParams();
   const [zoom, setZoom] = useState(100);
   const [viewMode, setViewMode] = useState<"split" | "reader">("split");
   const [mobileTab, setMobileTab] = useState<"materi" | "ai">("materi");
@@ -39,6 +42,14 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
 
   const citationTargetRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const qTanya = searchParams.get("tanya");
+    if (qTanya) {
+      setInputPrompt(qTanya);
+      setMobileTab("ai");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Cek apakah moduleId merujuk pada dokumen yang di-upload

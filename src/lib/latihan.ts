@@ -13,6 +13,8 @@ export interface SoalLatihan {
   pilihan: string[];
   indexBenar: number;
   halaman: string;
+  penjelasan: string;
+  penjelasanOpsi?: Record<string, string>;
 }
 
 const SKIP = new Set(
@@ -66,6 +68,15 @@ export function buatSoal(dok: DokumenUpload, topik: TopikDokumen, jumlah = 5): S
     const rumpang = kalimat.replace(new RegExp(`\\b${target}\\b`, "i"), "_____");
     if (rumpang === kalimat) continue;
 
+    const penjelasanOpsi: Record<string, string> = {};
+    pilihan.forEach((p) => {
+      if (p === t) {
+        penjelasanOpsi[p] = `Tepat. Sesuai modul, istilah "${p}" adalah konsep yang melengkapi pernyataan ini secara akurat.`;
+      } else {
+        penjelasanOpsi[p] = `Kurang tepat. Istilah "${p}" mengacu pada konsep materi lain di modul ini.`;
+      }
+    });
+
     hasil.push({
       id: `s-${hasil.length + 1}`,
       kalimat: rumpang,
@@ -73,6 +84,8 @@ export function buatSoal(dok: DokumenUpload, topik: TopikDokumen, jumlah = 5): S
       pilihan,
       indexBenar: pilihan.indexOf(t),
       halaman,
+      penjelasan: `Jawaban yang benar adalah "${t}". Dalam konteks kalimat modul: "${kalimat}".`,
+      penjelasanOpsi,
     });
   }
   return hasil;
