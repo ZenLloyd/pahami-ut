@@ -114,7 +114,15 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
     setTimeout(() => {
       if (uploadedDoc) {
         const currentTopic = uploadedDoc.topik[activeTopicIndex] || uploadedDoc.topik[0];
-        const ringkasanSnippet = currentTopic?.ringkasan?.[0] || "Pembahasan materi terkait konsep modul.";
+        const kataTanya = (currentInput.toLowerCase().match(/[a-zà-ÿ]{4,}/g) ?? []).filter(
+          (w) => !["apakah", "jelaskan", "rangkum", "bagian", "bedanya", "tentang"].includes(w),
+        );
+        const kandidat = currentTopic?.ringkasan ?? [];
+        const terbaik = kandidat
+          .map((k) => ({ k, s: kataTanya.filter((w) => k.toLowerCase().includes(w)).length }))
+          .sort((a, b) => b.s - a.s)[0];
+        const ringkasanSnippet =
+          terbaik?.k || "Pembahasan materi terkait konsep modul.";
         const aiReply: ChatMessage = {
           id: `msg-${Date.now() + 1}`,
           sender: "ai",
@@ -654,22 +662,29 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
               <span className="text-on-surface-variant shrink-0 font-mono text-[10px]">
                 Lanjut:
               </span>
-              <button
-                onClick={() =>
-                  setInputPrompt("Berikan contoh kodingan Stack di Python")
-                }
-                className="px-2.5 py-1 rounded-full bg-surface hover:bg-surface-variant text-on-surface border border-outline-variant whitespace-nowrap transition cursor-pointer"
-              >
-                Contoh Stack di Python
-              </button>
-              <button
-                onClick={() =>
-                  setInputPrompt("Apa bedanya operasi peek dan pop?")
-                }
-                className="px-2.5 py-1 rounded-full bg-surface hover:bg-surface-variant text-on-surface border border-outline-variant whitespace-nowrap transition cursor-pointer"
-              >
-                Beda peek vs pop
-              </button>
+              {(uploadedDoc
+                ? [
+                    ...(uploadedDoc.topik[activeTopicIndex]?.kataKunci ?? [])
+                      .slice(0, 3)
+                      .map((k) => ({ label: `Apa itu ${k}?`, prompt: `Apa itu ${k}?` })),
+                    {
+                      label: "Rangkum bagian ini",
+                      prompt: `Rangkum ${uploadedDoc.topik[activeTopicIndex]?.judul ?? "bagian ini"}`,
+                    },
+                  ]
+                : [
+                    { label: "Contoh Stack di Python", prompt: "Berikan contoh kodingan Stack di Python" },
+                    { label: "Beda peek vs pop", prompt: "Apa bedanya operasi peek dan pop?" },
+                  ]
+              ).map((s) => (
+                <button
+                  key={s.label}
+                  onClick={() => setInputPrompt(s.prompt)}
+                  className="px-2.5 py-1 rounded-full bg-surface hover:bg-surface-variant text-on-surface border border-outline-variant whitespace-nowrap transition cursor-pointer"
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
 
             {/* Chat Input Area with Safe Area Bottom */}
