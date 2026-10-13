@@ -78,7 +78,14 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
     setZoom((prev) => Math.min(Math.max(prev + delta, 70), 160));
   };
 
-  const handleCitationClick = () => {
+  const handleCitationClick = (page?: number) => {
+    if (uploadedDoc && page !== undefined) {
+      const idx = uploadedDoc.topik.findIndex(
+        (t) => page >= t.halamanMulai && page <= t.halamanAkhir,
+      );
+      if (idx >= 0) setActiveTopicIndex(idx);
+      scrollContainerRef.current?.scrollTo({ top: 0 });
+    }
     setMobileTab("materi");
     setTimeout(() => {
       if (citationTargetRef.current) {
@@ -603,7 +610,7 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                           {msg.citations.map((c) => (
                             <button
                               key={c.id}
-                              onClick={handleCitationClick}
+                              onClick={() => handleCitationClick(c.page)}
                               className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container hover:opacity-85 transition cursor-pointer"
                               title="Klik untuk membuka paragraf di modul"
                             >
