@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
+import { DokumenUploadSection } from "@/components/DokumenUploadSection";
 import { mockWeakTopics, mockModules } from "@/data/mockData";
 import {
   AlertTriangle,
@@ -157,6 +158,8 @@ export default function BerandaMahasiswaPage() {
             </div>
           </div>
         </section>
+
+        <DokumenUploadSection />
 
         {/* DAFTAR DOKUMEN MODUL DENGAN 3 VARIAN STATUS (Dokumen Hal 11) */}
         <section className="rounded-2xl bg-surface-container border border-outline-variant overflow-hidden">
