@@ -24,7 +24,7 @@ import {
   CheckCircle,
   FileText,
 } from "lucide-react";
-import { getDokumenById, type DokumenUpload } from "@/lib/dokumen";
+import { getDokumenById, ubahStatusTopik, type DokumenUpload } from "@/lib/dokumen";
 import { useEffect } from "react";
 
 export function LearningRoomClient({ moduleId }: { moduleId: string }) {
@@ -73,6 +73,15 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
       ]);
     }
   }, [moduleId]);
+
+  useEffect(() => {
+    if (!uploadedDoc) return;
+    const t = uploadedDoc.topik[activeTopicIndex];
+    if (t && t.status === "BELUM") {
+      const hasil = ubahStatusTopik(uploadedDoc.id, t.id, "BERJALAN");
+      if (hasil) setUploadedDoc({ ...hasil });
+    }
+  }, [uploadedDoc, activeTopicIndex]);
 
   const handleZoom = (delta: number) => {
     setZoom((prev) => Math.min(Math.max(prev + delta, 70), 160));
@@ -459,6 +468,27 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                     <span>{uploadedDoc.namaFile}</span>
                     <span>Hal. {uploadedDoc.topik[activeTopicIndex]?.halamanMulai || 1}–{uploadedDoc.topik[activeTopicIndex]?.halamanAkhir || uploadedDoc.totalHalaman}</span>
                   </div>
+
+                  {uploadedDoc.topik[activeTopicIndex] && (
+                    <button
+                      onClick={() => {
+                        const t = uploadedDoc.topik[activeTopicIndex];
+                        const baru = t.status === "SELESAI" ? "BERJALAN" : "SELESAI";
+                        const hasil = ubahStatusTopik(uploadedDoc.id, t.id, baru);
+                        if (hasil) setUploadedDoc({ ...hasil });
+                      }}
+                      className={`mt-4 w-full min-h-12 rounded-full text-sm font-semibold inline-flex items-center justify-center gap-2 transition cursor-pointer ${
+                        uploadedDoc.topik[activeTopicIndex].status === "SELESAI"
+                          ? "border border-outline-variant bg-surface-container-high text-on-surface"
+                          : "bg-primary text-on-primary hover:opacity-90"
+                      }`}
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      {uploadedDoc.topik[activeTopicIndex].status === "SELESAI"
+                        ? "Selesai — klik untuk batalkan"
+                        : "Tandai Selesai Dipelajari"}
+                    </button>
+                  )}
                 </>
               ) : (
                 <>

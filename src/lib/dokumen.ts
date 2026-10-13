@@ -112,3 +112,12 @@ export function buatTopikSimulasi(totalHalaman: number): TopikDokumen[] {
 export function perkirakanHalaman(ukuranBytes: number): number {
   return Math.min(400, Math.max(24, Math.round(ukuranBytes / (30 * 1024))));
 }
+
+export function ubahStatusTopik(dokId: string, topikId: string, status: TopikDokumen['status']): DokumenUpload | null {
+  const semua = getDokumenUpload();
+  const dok = semua.find((d) => d.id === dokId);
+  if (!dok) return null;
+  dok.topik = dok.topik.map((t) => (t.id === topikId ? { ...t, status } : t));
+  localStorage.setItem(KEY, JSON.stringify(semua));
+  return dok;
+}
