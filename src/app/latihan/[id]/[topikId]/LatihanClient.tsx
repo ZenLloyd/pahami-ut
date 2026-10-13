@@ -20,6 +20,8 @@ export function LatihanClient() {
   const [diperiksa, setDiperiksa] = useState(false);
   const [benar, setBenar] = useState(0);
   const [selesai, setSelesai] = useState(false);
+  const [konfirmasiKeluar, setKonfirmasiKeluar] = useState(false);
+  const [riwayatJawaban, setRiwayatJawaban] = useState<{ soal: SoalLatihan; indexPilihan: number; benar: boolean }[]>([]);
 
   const mulai = useCallback((d: DokumenUpload) => {
     const t = d.topik.find((x) => x.id === topikId);
@@ -29,6 +31,8 @@ export function LatihanClient() {
     setDiperiksa(false);
     setBenar(0);
     setSelesai(false);
+    setRiwayatJawaban([]);
+    setKonfirmasiKeluar(false);
   }, [topikId]);
 
   useEffect(() => {
@@ -45,7 +49,9 @@ export function LatihanClient() {
   const periksa = useCallback(() => {
     if (pilih === null || diperiksa || !s) return;
     setDiperiksa(true);
-    if (pilih === s.indexBenar) setBenar((b) => b + 1);
+    const isCorrect = pilih === s.indexBenar;
+    if (isCorrect) setBenar((b) => b + 1);
+    setRiwayatJawaban((prev) => [...prev, { soal: s, indexPilihan: pilih, benar: isCorrect }]);
   }, [pilih, diperiksa, s]);
 
   const lanjut = useCallback(() => {
@@ -54,7 +60,7 @@ export function LatihanClient() {
       setPilih(null);
       setDiperiksa(false);
     } else {
-      const total = Math.round(((benar) / soal.length) * 100);
+      const total = Math.round((benar / soal.length) * 100);
       simpanSkorTopik(id, topikId, total);
       setSelesai(true);
     }
@@ -83,12 +89,21 @@ export function LatihanClient() {
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans">
       <Navbar />
       <main className="flex-1 max-w-2xl w-full mx-auto p-4 md:p-8 pb-24 md:pb-8 space-y-5">
-        <Link
-          href={kembali}
-          className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-on-surface transition"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Ruang Belajar
-        </Link>
+        {!selesai ? (
+          <button
+            onClick={() => setKonfirmasiKeluar(true)}
+            className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-on-surface transition cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Ruang Belajar
+          </button>
+        ) : (
+          <Link
+            href={kembali}
+            className="inline-flex items-center gap-1.5 text-xs text-on-surface-variant hover:text-on-surface transition"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Ruang Belajar
+          </Link>
+        )}
 
         {siap && (!dok || !topik) && (
           <div className="rounded-2xl border border-outline-variant bg-surface-container p-8 text-center text-sm">
@@ -226,22 +241,56 @@ export function LatihanClient() {
               {skor >= BATAS_LULUS ? `${topik.judul}: Selesai` : `${topik.judul}: Perlu diulang`}
             </span>
             <p className="text-sm">{pesanSkor(skor)}</p>
+            {/* TINJAUAN JAWABAN (S-10) */}
+            <div className="pt-4 text-left border-t border-outline-variant space-y-3">
+              <h3 className="text-xs font-semibold text-primary uppercase font-mono tracking-wider">
+                Tinjauan Hasil Jawaban
+              </h3>
+              <div className="space-y-2.5">
+                {riwayatJawaban.map((r, i) => (
+                  <div
+                    key={i}
+                    className="p-3.5 rounded-2xl bg-surface border border-outline-variant text-xs space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-semibold text-on-surface">Soal {i + 1}</span>
+                      <span
+                        className={`font-mono text-[10px] px-2 py-0.5 rounded-full ${
+                          r.benar ? "bg-primary/20 text-primary" : "bg-error/20 text-error"
+                        }`}
+                      >
+                        {r.benar ? "Benar" : "Salah"}
+                      </span>
+                    </div>
+                    <p className="text-on-surface leading-relaxed">{r.soal.kalimat}</p>
+                    <div className="text-[11px] font-mono text-on-surface-variant flex flex-wrap gap-x-4 gap-y-1 pt-1 border-t border-outline-variant/40">
+                      <span>Jawabanmu: <strong className={r.benar ? "text-primary" : "text-error"}>{r.soal.pilihan[r.indexPilihan]}</strong></span>
+                      {!r.benar && (
+                        <span>Kunci: <strong className="text-primary">{r.soal.pilihan[r.soal.indexBenar]}</strong></span>
+                      )}
+                      <span>({r.soal.halaman})</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-2.5 justify-center pt-2">
               <button
                 onClick={() => dok && mulai(dok)}
-                className="min-h-12 px-6 rounded-full border border-outline-variant bg-surface-container-high text-sm font-medium inline-flex items-center justify-center gap-2 cursor-pointer"
+                className="min-h-12 px-6 rounded-full border border-outline-variant bg-surface-container-high text-sm font-medium inline-flex items-center justify-center gap-2 cursor-pointer hover:bg-surface-variant"
               >
                 <RotateCcw className="w-4 h-4" /> Ulangi Latihan
               </button>
               <Link
                 href={kembali}
-                className="min-h-12 px-6 rounded-full bg-primary text-on-primary text-sm font-semibold inline-flex items-center justify-center"
+                className="min-h-12 px-6 rounded-full bg-primary text-on-primary text-sm font-semibold inline-flex items-center justify-center shadow-sm"
               >
                 Kembali ke Ruang Belajar
               </Link>
               <Link
                 href={`/dokumen/${id}`}
-                className="min-h-12 px-6 rounded-full border border-outline-variant text-sm font-medium inline-flex items-center justify-center"
+                className="min-h-12 px-6 rounded-full border border-outline-variant text-sm font-medium inline-flex items-center justify-center hover:bg-surface-container-high"
               >
                 Lihat Jalur Belajar
               </Link>
@@ -249,6 +298,37 @@ export function LatihanClient() {
           </section>
         )}
       </main>
+
+      {/* DIALOG KONFIRMASI KELUAR LATIHAN (BR-33 · MSG-L03) */}
+      {konfirmasiKeluar && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="judul-keluar"
+        >
+          <div className="w-full max-w-sm rounded-3xl bg-surface-container-high border border-outline-variant p-6 space-y-4">
+            <h2 id="judul-keluar" className="text-base font-bold">Keluar dari Latihan?</h2>
+            <p className="text-xs text-on-surface-variant leading-relaxed">
+              Keluar dari latihan? Jawabanmu belum disimpan.
+            </p>
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                onClick={() => setKonfirmasiKeluar(false)}
+                className="min-h-12 px-5 rounded-full text-sm font-medium hover:bg-surface-variant cursor-pointer"
+              >
+                Lanjutkan Latihan
+              </button>
+              <Link
+                href={kembali}
+                className="min-h-12 px-5 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold inline-flex items-center justify-center cursor-pointer"
+              >
+                Keluar
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

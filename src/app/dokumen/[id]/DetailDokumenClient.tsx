@@ -9,8 +9,9 @@ import {
   formatUkuran,
   getDokumenById,
   hapusDokumen,
+  ubahNamaDokumen,
 } from "@/lib/dokumen";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, Edit3, FileText, Trash2, CheckCircle2 } from "lucide-react";
 
 const LABEL_STATUS = {
   BELUM: { teks: "Belum dipelajari", kelas: "bg-surface-variant text-on-surface-variant" },
@@ -24,15 +25,35 @@ export function DetailDokumenClient() {
   const [dok, setDok] = useState<DokumenUpload | null>(null);
   const [siap, setSiap] = useState(false);
   const [konfirmasi, setKonfirmasi] = useState(false);
+  const [dialogEdit, setDialogEdit] = useState(false);
+  const [judulInput, setJudulInput] = useState("");
+  const [pesanSukses, setPesanSukses] = useState("");
+  const [errorEdit, setErrorEdit] = useState("");
 
   useEffect(() => {
-    setDok(getDokumenById(id));
+    const d = getDokumenById(id);
+    setDok(d);
+    if (d) setJudulInput(d.judul);
     setSiap(true);
   }, [id]);
 
   function hapus() {
     hapusDokumen(id);
     router.push("/beranda");
+  }
+
+  function handleSimpanNama() {
+    if (!dok) return;
+    const res = ubahNamaDokumen(dok.id, judulInput);
+    if (!res.ok) {
+      setErrorEdit(res.pesan);
+      return;
+    }
+    setDok({ ...res.dok });
+    setDialogEdit(false);
+    setErrorEdit("");
+    setPesanSukses("Nama dokumen berhasil diubah."); // MSG-D01
+    setTimeout(() => setPesanSukses(""), 3500);
   }
 
   return (
@@ -146,16 +167,36 @@ export function DetailDokumenClient() {
               </ol>
             </section>
 
+            {pesanSukses && (
+              <div
+                role="status"
+                className="flex items-center gap-2 p-3.5 rounded-2xl bg-primary/10 border border-primary/30 text-xs text-primary"
+              >
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>{pesanSukses}</span>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-2.5">
               <Link
                 href={`/learning/${dok.id}`}
-                className="min-h-12 px-6 rounded-full bg-primary text-on-primary font-semibold text-sm hover:opacity-90 transition inline-flex items-center justify-center gap-2"
+                className="min-h-12 px-6 rounded-full bg-primary text-on-primary font-semibold text-sm hover:opacity-90 transition inline-flex items-center justify-center gap-2 shadow-sm"
               >
                 <BookOpen className="w-4 h-4" /> Buka Ruang Belajar <ArrowRight className="w-4 h-4" />
               </Link>
               <button
+                onClick={() => {
+                  setJudulInput(dok.judul);
+                  setErrorEdit("");
+                  setDialogEdit(true);
+                }}
+                className="min-h-12 px-5 rounded-full border border-outline-variant bg-surface-container-high text-on-surface text-sm font-medium hover:bg-surface-variant transition inline-flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Edit3 className="w-4 h-4" /> Ganti Nama
+              </button>
+              <button
                 onClick={() => setKonfirmasi(true)}
-                className="min-h-12 px-6 rounded-full border border-error/50 text-error text-sm font-medium hover:bg-error-container/20 transition inline-flex items-center justify-center gap-2 cursor-pointer"
+                className="min-h-12 px-5 rounded-full border border-error/50 text-error text-sm font-medium hover:bg-error-container/20 transition inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" /> Hapus Dokumen
               </button>
@@ -164,17 +205,65 @@ export function DetailDokumenClient() {
         )}
       </main>
 
-      {konfirmasi && (
+      {/* DIALOG GANTI NAMA (BP-09 · BR-21 · MSG-D01) */}
+      {dialogEdit && dok && (
         <div
-          className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 backdrop-blur-xs"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="judul-edit"
+        >
+          <div className="w-full max-w-md rounded-3xl bg-surface-container-high border border-outline-variant p-6 space-y-4">
+            <h2 id="judul-edit" className="text-base font-bold">Ganti Nama Dokumen</h2>
+            <p className="text-xs text-on-surface-variant">
+              Sesuaikan nama modul agar lebih mudah dikenali (3–100 karakter).
+            </p>
+            <div>
+              <input
+                type="text"
+                value={judulInput}
+                onChange={(e) => setJudulInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSimpanNama();
+                }}
+                className="w-full min-h-12 px-4 rounded-2xl bg-surface border border-outline focus:border-primary text-sm text-on-surface focus:outline-none"
+                placeholder="Masukkan judul dokumen..."
+                maxLength={100}
+              />
+              {errorEdit && (
+                <p className="text-xs text-error mt-1.5">{errorEdit}</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                onClick={() => setDialogEdit(false)}
+                className="min-h-12 px-5 rounded-full text-sm font-medium hover:bg-surface-variant cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSimpanNama}
+                className="min-h-12 px-6 rounded-full bg-primary text-on-primary text-sm font-semibold hover:opacity-90 cursor-pointer"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DIALOG HAPUS DOKUMEN (BP-09 · BR-20 · MSG-D02) */}
+      {konfirmasi && dok && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           aria-labelledby="judul-hapus"
         >
           <div className="w-full max-w-sm rounded-3xl bg-surface-container-high border border-outline-variant p-6 space-y-4">
-            <h2 id="judul-hapus" className="text-base font-bold">Hapus dokumen ini?</h2>
-            <p className="text-xs text-on-surface-variant">
-              Dokumen dan progres belajarnya akan dihapus dan tidak bisa dikembalikan.
+            <h2 id="judul-hapus" className="text-base font-bold">Hapus Dokumen?</h2>
+            <p className="text-xs text-on-surface-variant leading-relaxed">
+              Hapus &quot;{dok.judul}&quot;? Semua topik, latihan, dan riwayat tanya AI dokumen ini ikut terhapus dan tidak bisa dikembalikan.
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -187,7 +276,7 @@ export function DetailDokumenClient() {
                 onClick={hapus}
                 className="min-h-12 px-5 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold cursor-pointer"
               >
-                Hapus
+                Hapus Permanen
               </button>
             </div>
           </div>

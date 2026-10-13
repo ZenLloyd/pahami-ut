@@ -470,38 +470,26 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
                   </div>
 
                   {uploadedDoc.topik[activeTopicIndex] && (
-                    <Link
-                      href={`/latihan/${uploadedDoc.id}/${uploadedDoc.topik[activeTopicIndex].id}`}
-                      className="mt-4 w-full min-h-12 rounded-full bg-primary text-on-primary text-sm font-semibold inline-flex items-center justify-center gap-2 hover:opacity-90 transition"
-                    >
-                      Mulai Latihan 5 Soal
-                      {uploadedDoc.topik[activeTopicIndex].skorTerakhir !== undefined && (
-                        <span className="text-[11px] font-mono opacity-80">
-                          (skor terakhir {uploadedDoc.topik[activeTopicIndex].skorTerakhir})
-                        </span>
-                      )}
-                    </Link>
-                  )}
-
-                  {uploadedDoc.topik[activeTopicIndex] && (
-                    <button
-                      onClick={() => {
-                        const t = uploadedDoc.topik[activeTopicIndex];
-                        const baru = t.status === "SELESAI" ? "BERJALAN" : "SELESAI";
-                        const hasil = ubahStatusTopik(uploadedDoc.id, t.id, baru);
-                        if (hasil) setUploadedDoc({ ...hasil });
-                      }}
-                      className={`mt-4 w-full min-h-12 rounded-full text-sm font-semibold inline-flex items-center justify-center gap-2 transition cursor-pointer ${
-                        uploadedDoc.topik[activeTopicIndex].status === "SELESAI"
-                          ? "border border-outline-variant bg-surface-container-high text-on-surface"
-                          : "bg-primary text-on-primary hover:opacity-90"
-                      }`}
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      {uploadedDoc.topik[activeTopicIndex].status === "SELESAI"
-                        ? "Selesai — klik untuk batalkan"
-                        : "Tandai Selesai Dipelajari"}
-                    </button>
+                    <div className="mt-6 pt-4 border-t border-outline-variant space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-on-surface-variant font-mono">Evaluasi Pemahaman (BR-12 & BR-13)</span>
+                        <span className="font-mono text-primary">Batas Lulus: ≥ 70</span>
+                      </div>
+                      <Link
+                        href={`/latihan/${uploadedDoc.id}/${uploadedDoc.topik[activeTopicIndex].id}`}
+                        className="w-full min-h-12 rounded-full bg-primary text-on-primary text-sm font-semibold inline-flex items-center justify-center gap-2 hover:opacity-90 transition shadow-sm"
+                      >
+                        <span>Mulai Latihan Kuis (5 Soal)</span>
+                        {uploadedDoc.topik[activeTopicIndex].skorTerakhir !== undefined && (
+                          <span className="text-xs font-mono bg-on-primary/20 px-2 py-0.5 rounded-full">
+                            Skor Terakhir: {uploadedDoc.topik[activeTopicIndex].skorTerakhir}
+                          </span>
+                        )}
+                      </Link>
+                      <p className="text-[11px] text-center text-on-surface-variant">
+                        Selesaikan kuis dengan nilai minimal 70 untuk menandai topik ini telah dikuasai.
+                      </p>
+                    </div>
                   )}
                 </>
               ) : (

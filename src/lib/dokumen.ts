@@ -55,6 +55,20 @@ export function hapusDokumen(id: string): void {
   localStorage.setItem(KEY, JSON.stringify(semua));
 }
 
+/** BR-21: ubah nama dokumen (3–100 karakter) */
+export function ubahNamaDokumen(id: string, judulBaru: string): { ok: true; dok: DokumenUpload } | { ok: false; pesan: string } {
+  const judul = judulBaru.trim();
+  if (judul.length < 3 || judul.length > 100) {
+    return { ok: false, pesan: "Judul dokumen harus 3–100 karakter." };
+  }
+  const semua = getDokumenUpload();
+  const dok = semua.find((d) => d.id === id);
+  if (!dok) return { ok: false, pesan: "Dokumen tidak ditemukan." };
+  dok.judul = judul;
+  localStorage.setItem(KEY, JSON.stringify(semua));
+  return { ok: true, dok };
+}
+
 export type HasilValidasi = { ok: true } | { ok: false; pesan: string };
 
 /** BR-01: hanya PDF · BR-02: maks 50 MB */
