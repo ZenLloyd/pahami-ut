@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { type DokumenUpload, getDokumenById, simpanSkorTopik } from "@/lib/dokumen";
 import { type SoalLatihan, buatSoal, pesanSkor } from "@/lib/latihan";
-import { ArrowLeft, ArrowRight, Check, RotateCcw, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, RotateCcw, Sparkles, X } from "lucide-react";
 
 const BATAS_LULUS = 70;
 
@@ -217,7 +217,7 @@ export function LatihanClient() {
                   {/* Kutipan Asli Buku / Pembahasan */}
                   <div className="space-y-1">
                     <p className="text-on-surface-variant font-mono text-[11px]">
-                      📖 Konteks Pembahasan dalam Modul ({s.halaman}):
+                      Konteks Pembahasan dalam Modul ({s.halaman}):
                     </p>
                     <p className="italic text-on-surface bg-surface-container-high/50 p-2.5 rounded-xl border border-outline-variant/40">
                       &quot;{s.kalimatAsli}&quot;
@@ -233,7 +233,8 @@ export function LatihanClient() {
                       href={`${kembali}?tanya=${encodeURIComponent(`Jelaskan konsep soal ini dari modul: "${s.kalimatAsli}"`)}`}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-primary border border-primary/30 font-semibold text-[11px] transition"
                     >
-                      <span>💡 Tanya Asisten AI</span>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Tanya Asisten AI</span>
                       <ArrowRight className="w-3 h-3" />
                     </Link>
                   </div>
