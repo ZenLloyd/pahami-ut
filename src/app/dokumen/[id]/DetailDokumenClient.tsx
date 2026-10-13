@@ -10,7 +10,7 @@ import {
   getDokumenById,
   hapusDokumen,
 } from "@/lib/dokumen";
-import { ArrowLeft, ArrowRight, BookOpen, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, FileText, Trash2 } from "lucide-react";
 
 const LABEL_STATUS = {
   BELUM: { teks: "Belum dipelajari", kelas: "bg-surface-variant text-on-surface-variant" },
@@ -74,7 +74,10 @@ export function DetailDokumenClient() {
                   {dok.totalHalaman} halaman • {formatUkuran(dok.ukuranBytes)} • {dok.topik.length} kegiatan belajar
                 </p>
                 <p className="text-[11px] text-on-surface-variant mt-1">
-                  Jumlah halaman & pembagian topik masih simulasi sampai pemrosesan backend terhubung.
+                  {dok.topikTerdeteksi
+                    ? "Topik dikenali dari judul “Kegiatan Belajar” di PDF."
+                    : "Judul Kegiatan Belajar tidak ditemukan di PDF, jadi dokumen dibagi rata."}{" "}
+                  Ringkasan disusun otomatis dari kalimat terpenting, belum memakai AI.
                 </p>
               </div>
             </header>
@@ -87,20 +90,55 @@ export function DetailDokumenClient() {
                   return (
                     <li
                       key={t.id}
-                      className="flex items-center gap-3 rounded-2xl border border-outline-variant bg-surface-container p-4"
+                      className="rounded-2xl border border-outline-variant bg-surface-container overflow-hidden"
                     >
-                      <span className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-mono shrink-0">
-                        {i + 1}
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold">{t.judul}</p>
-                        <p className="text-[11px] font-mono text-on-surface-variant">
-                          Hal. {t.halamanMulai}–{t.halamanAkhir}
-                        </p>
-                      </div>
-                      <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full shrink-0 ${st.kelas}`}>
-                        {st.teks}
-                      </span>
+                      <details className="group">
+                        <summary className="flex items-center gap-3 p-4 cursor-pointer list-none min-h-14 [&::-webkit-details-marker]:hidden">
+                          <span className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-mono shrink-0">
+                            {i + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">{t.judul}</p>
+                            <p className="text-[11px] font-mono text-on-surface-variant">
+                              Hal. {t.halamanMulai}–{t.halamanAkhir}
+                            </p>
+                          </div>
+                          <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full shrink-0 ${st.kelas}`}>
+                            {st.teks}
+                          </span>
+                          <ChevronDown className="w-4 h-4 text-on-surface-variant shrink-0 transition group-open:rotate-180" />
+                        </summary>
+                        <div className="px-4 pb-4 pt-1 space-y-3 border-t border-outline-variant/60">
+                          {t.ringkasan && t.ringkasan.length > 0 ? (
+                            <>
+                              <p className="text-[11px] font-mono text-primary pt-3">
+                                Ringkasan otomatis
+                              </p>
+                              <ul className="space-y-2 list-disc pl-4 text-xs leading-relaxed text-on-surface">
+                                {t.ringkasan.map((k, j) => (
+                                  <li key={j}>{k}</li>
+                                ))}
+                              </ul>
+                              {t.kataKunci && t.kataKunci.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                  {t.kataKunci.map((w) => (
+                                    <span
+                                      key={w}
+                                      className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface-container-high border border-outline-variant"
+                                    >
+                                      {w}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <p className="text-xs text-on-surface-variant pt-3">
+                              Bagian ini tidak memiliki cukup teks untuk diringkas.
+                            </p>
+                          )}
+                        </div>
+                      </details>
                     </li>
                   );
                 })}

@@ -8,14 +8,13 @@ import { mockModules } from "@/data/mockData";
 import {
   MAKS_DOKUMEN,
   MAKS_UKURAN_MB,
-  buatTopikSimulasi,
   formatUkuran,
   getDokumenUpload,
   judulDariNamaFile,
-  perkirakanHalaman,
   simpanDokumen,
   validasiFile,
 } from "@/lib/dokumen";
+import { PdfTanpaTeksError, prosesPdf } from "@/lib/pdf-proses";
 import {
   AlertCircle,
   ArrowLeft,
@@ -42,6 +41,7 @@ export default function UploadPage() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const dibatalkan = useRef(false);
 
   const [fase, setFase] = useState<Fase>("AWAL");
   const [file, setFile] = useState<File | null>(null);
@@ -79,42 +79,43 @@ export default function UploadPage() {
     setTahap(0);
     setPersen(0);
 
-    let p = 0;
-    timer.current = setInterval(() => {
-      p += 2;
-      setPersen(Math.min(p, 100));
-      setTahap(Math.min(TAHAP.length - 1, Math.floor((p / 100) * TAHAP.length)));
-      if (p >= 100) {
-        if (timer.current) clearInterval(timer.current);
-        selesai();
-      }
-    }, 90);
+    dibatalkan.current = false;
+    jalankan(file);
   }
 
-  function selesai() {
-    if (!file) return;
+  async function jalankan(f: File) {
     try {
-      const halaman = perkirakanHalaman(file.size);
+      const hasil = await prosesPdf(f, (p, t) => {
+        setPersen(p);
+        setTahap(t);
+      });
+      if (dibatalkan.current) return;
       const id = `up-${Date.now()}`;
       simpanDokumen({
         id,
-        namaFile: file.name,
-        judul: judulDariNamaFile(file.name),
-        ukuranBytes: file.size,
-        totalHalaman: halaman,
+        namaFile: f.name,
+        judul: judulDariNamaFile(f.name),
+        ukuranBytes: f.size,
+        totalHalaman: hasil.totalHalaman,
         diunggahPada: new Date().toISOString(),
         status: "SIAP",
-        topik: buatTopikSimulasi(halaman),
+        topik: hasil.topik,
+        topikTerdeteksi: hasil.terdeteksiOtomatis,
       });
       setIdBaru(id);
       setFase("SUKSES");
-    } catch {
-      setError("Dokumen gagal diproses. Coba unggah ulang.");
+    } catch (e) {
+      setError(
+        e instanceof PdfTanpaTeksError
+          ? e.message
+          : "Dokumen gagal diproses. Pastikan PDF tidak rusak atau dikunci kata sandi, lalu coba lagi.",
+      );
       setFase("GAGAL");
     }
   }
 
   function ulang() {
+    dibatalkan.current = true;
     if (timer.current) clearInterval(timer.current);
     setFase("AWAL");
     setFile(null);

@@ -13,6 +13,8 @@ export interface TopikDokumen {
   halamanMulai: number;
   halamanAkhir: number;
   status: "BELUM" | "BERJALAN" | "SELESAI";
+  ringkasan?: string[];
+  kataKunci?: string[];
 }
 
 export interface DokumenUpload {
@@ -24,6 +26,7 @@ export interface DokumenUpload {
   diunggahPada: string; // ISO
   status: "SIAP" | "DIPROSES" | "GAGAL";
   topik: TopikDokumen[];
+  topikTerdeteksi?: boolean;
 }
 
 export function getDokumenUpload(): DokumenUpload[] {
