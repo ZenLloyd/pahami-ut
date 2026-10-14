@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { mockStudent } from "@/data/mockData";
 import { LogoutModal } from "@/components/LogoutModal";
-import { BookOpen, Layers, BarChart3, User } from "lucide-react";
+import { Layers, BarChart3, Upload, User } from "lucide-react";
 
 export function BottomNav({ onOpenLogout }: { onOpenLogout?: () => void }) {
   const pathname = usePathname();
@@ -21,10 +21,10 @@ export function BottomNav({ onOpenLogout }: { onOpenLogout?: () => void }) {
       isActive: pathname === "/beranda",
     },
     {
-      label: "Ruang Belajar",
-      href: "/learning/mod-02",
-      icon: BookOpen,
-      isActive: pathname.startsWith("/learning"),
+      label: "Upload",
+      href: "/upload",
+      icon: Upload,
+      isActive: pathname === "/upload",
     },
     {
       label: "Progres",

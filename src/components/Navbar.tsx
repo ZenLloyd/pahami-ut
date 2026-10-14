@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/BottomNav";
 import { LogoutModal } from "@/components/LogoutModal";
 import { LogoUT } from "@/components/LogoUT";
-import { BookOpen, Layers, BarChart3, Search, LogOut } from "lucide-react";
+import { Layers, BarChart3, Upload, Search, LogOut } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -43,15 +43,15 @@ export function Navbar() {
             </Link>
 
             <Link
-              href="/learning/mod-02"
+              href="/upload"
               className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition ${
-                pathname.startsWith("/learning")
+                pathname === "/upload"
                   ? "bg-primary-container text-on-primary-container font-semibold"
                   : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              Ruang Belajar
+              <Upload className="w-3.5 h-3.5" />
+              Upload PDF
             </Link>
 
             <Link
