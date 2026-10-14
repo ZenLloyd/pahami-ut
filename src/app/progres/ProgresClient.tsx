@@ -95,9 +95,12 @@ export function ProgresClient() {
             </section>
 
             <section className="rounded-2xl border border-outline-variant bg-surface-container p-5 space-y-4">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold">Skor Terakhir per Topik</h2>
-                <span className="text-[10px] font-mono text-on-surface-variant">garis = batas {BATAS_SELESAI}</span>
+                <div className="flex items-center gap-1.5 text-[11px] text-on-surface-variant bg-surface px-2.5 py-1 rounded-full border border-outline-variant/60 font-medium self-start sm:self-auto">
+                  <span className="w-1 h-2.5 bg-on-surface/70 rounded-full inline-block" />
+                  <span>Batas Tuntas (KKM): Skor {BATAS_SELESAI}</span>
+                </div>
               </div>
               <ul className="space-y-3">
                 {topik.map((t) => {
