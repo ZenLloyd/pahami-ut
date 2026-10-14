@@ -219,12 +219,13 @@ export default function AdminDashboardPage() {
                 Monitoring mahasiswa baru yang bergabung ke platform
               </p>
             </div>
-            <button
-              onClick={() => alert("Membuka daftar lengkap semua pengguna (S-15).")}
-              className="text-xs text-primary hover:underline font-medium cursor-pointer"
+            <Link
+              href="/admin/pengguna"
+              className="text-xs text-primary hover:underline font-medium inline-flex items-center gap-1 cursor-pointer"
             >
-              Lihat Semua Pengguna ↗
-            </button>
+              <span>Lihat Semua Pengguna</span>
+              <span>↗</span>
+            </Link>
           </div>
 
           <div className="overflow-x-auto">
