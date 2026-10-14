@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
-import { mockModules } from "@/data/mockData";
 import {
   MAKS_DOKUMEN,
   MAKS_UKURAN_MB,
@@ -15,6 +14,7 @@ import {
   validasiFile,
 } from "@/lib/dokumen";
 import { PdfTanpaTeksError, prosesPdf } from "@/lib/pdf-proses";
+import { SYSTEM_MESSAGES as MSG } from "@/lib/messages";
 import {
   AlertCircle,
   ArrowLeft,
@@ -50,10 +50,10 @@ export default function UploadPage() {
   const [tahap, setTahap] = useState(0);
   const [persen, setPersen] = useState(0);
   const [idBaru, setIdBaru] = useState("");
-  const [terpakai, setTerpakai] = useState(mockModules.length);
+  const [terpakai, setTerpakai] = useState(0);
 
   useEffect(() => {
-    setTerpakai(mockModules.length + getDokumenUpload().length);
+    setTerpakai(getDokumenUpload().filter((d) => d.status !== "GAGAL").length);
     return () => {
       if (timer.current) clearInterval(timer.current);
     };
@@ -153,10 +153,7 @@ export default function UploadPage() {
         {kuotaPenuh && fase === "AWAL" && (
           <div className="flex items-start gap-2.5 rounded-xl border border-error/40 bg-error-container/20 p-4 text-xs">
             <AlertCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />
-            <p>
-              Kuota {MAKS_DOKUMEN} dokumen sudah penuh. Hapus salah satu dokumen
-              dari Beranda sebelum mengunggah yang baru.
-            </p>
+            <p>{MSG.MSG_U03(MAKS_DOKUMEN)}</p>
           </div>
         )}
 
