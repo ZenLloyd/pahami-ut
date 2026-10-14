@@ -372,8 +372,8 @@ export function BerandaClient() {
             ) : null}
 
             {/* DAFTAR DOKUMEN MODUL MAHASISWA (S-06) */}
-            <section className="rounded-2xl bg-surface-container border border-outline-variant overflow-hidden">
-              <div className="px-5 py-4 border-b border-outline-variant flex items-center justify-between">
+            <section className="rounded-2xl bg-surface-container border border-outline-variant">
+              <div className="px-5 py-4 border-b border-outline-variant flex items-center justify-between rounded-t-2xl">
                 <div>
                   <h2 className="text-sm font-semibold text-on-surface">
                     Daftar Dokumen Modul (BMP UT)
@@ -388,13 +388,18 @@ export function BerandaClient() {
               </div>
 
               {/* List Kartu Dokumen (Varian Siap, Diproses, Gagal) */}
-              <ul className="divide-y divide-outline-variant/60">
+              <ul className="divide-y divide-outline-variant/60 rounded-b-2xl">
                 {daftar.map((d) => {
                   const r = ringkasDokumen(d);
                   const isMenuBuka = menuAktif === d.id;
 
                   return (
-                    <li key={d.id} className="p-4 md:p-5 hover:bg-surface-container-high/40 transition">
+                    <li
+                      key={d.id}
+                      className={`p-4 md:p-5 hover:bg-surface-container-high/40 transition first:rounded-none last:rounded-b-2xl ${
+                        isMenuBuka ? "relative z-30" : ""
+                      }`}
+                    >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-start gap-3.5 min-w-0 flex-1">
                           <div className="w-10 h-10 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 mt-0.5">
@@ -462,30 +467,38 @@ export function BerandaClient() {
                             </button>
 
                             {isMenuBuka && (
-                              <div className="absolute right-0 top-10 z-20 w-44 rounded-2xl bg-surface-container-high border border-outline-variant shadow-lg p-1.5 text-xs space-y-0.5">
-                                <button
-                                  onClick={() => {
-                                    setDokEdit(d);
-                                    setJudulInput(d.judul);
-                                    setErrEdit("");
-                                    setMenuAktif(null);
-                                  }}
-                                  className="w-full px-3 py-2 rounded-xl text-left hover:bg-surface-variant flex items-center gap-2 cursor-pointer"
-                                >
-                                  <Edit3 className="w-3.5 h-3.5" />
-                                  <span>Ganti Nama</span>
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setDokHapus(d);
-                                    setMenuAktif(null);
-                                  }}
-                                  className="w-full px-3 py-2 rounded-xl text-left text-error hover:bg-error-container/20 flex items-center gap-2 cursor-pointer"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  <span>Hapus Dokumen</span>
-                                </button>
-                              </div>
+                              <>
+                                {/* Backdrop transparan untuk klik-luar */}
+                                <div
+                                  className="fixed inset-0 z-30"
+                                  onClick={() => setMenuAktif(null)}
+                                />
+
+                                <div className="absolute right-0 top-11 z-40 w-48 rounded-2xl bg-surface-container-high border border-outline-variant shadow-2xl p-1.5 text-xs space-y-1">
+                                  <button
+                                    onClick={() => {
+                                      setDokEdit(d);
+                                      setJudulInput(d.judul);
+                                      setErrEdit("");
+                                      setMenuAktif(null);
+                                    }}
+                                    className="w-full px-3 py-2.5 rounded-xl text-left hover:bg-surface-variant flex items-center gap-2 cursor-pointer font-medium text-on-surface"
+                                  >
+                                    <Edit3 className="w-4 h-4 text-primary" />
+                                    <span>Ganti Nama</span>
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setDokHapus(d);
+                                      setMenuAktif(null);
+                                    }}
+                                    className="w-full px-3 py-2.5 rounded-xl text-left text-error hover:bg-error/15 flex items-center gap-2 cursor-pointer font-medium"
+                                  >
+                                    <Trash2 className="w-4 h-4 text-error" />
+                                    <span>Hapus Dokumen</span>
+                                  </button>
+                                </div>
+                              </>
                             )}
                           </div>
                         </div>
