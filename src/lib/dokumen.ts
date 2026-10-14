@@ -30,6 +30,7 @@ export interface DokumenUpload {
   status: "SIAP" | "DIPROSES" | "GAGAL";
   topik: TopikDokumen[];
   topikTerdeteksi?: boolean;
+  aktivitasTerakhir?: { topikId: string; waktu: string }; // BR-34
 }
 
 export function getDokumenUpload(): DokumenUpload[] {
@@ -130,6 +131,19 @@ export function perkirakanHalaman(ukuranBytes: number): number {
   return Math.min(400, Math.max(24, Math.round(ukuranBytes / (30 * 1024))));
 }
 
+function catatAktivitasDi(dok: DokumenUpload, topikId: string) {
+  dok.aktivitasTerakhir = { topikId, waktu: new Date().toISOString() };
+}
+
+/** BR-34: catat topik yang terakhir dibuka/dilatih. */
+export function catatAktivitas(dokId: string, topikId: string): void {
+  const semua = getDokumenUpload();
+  const dok = semua.find((d) => d.id === dokId);
+  if (!dok) return;
+  catatAktivitasDi(dok, topikId);
+  localStorage.setItem(KEY, JSON.stringify(semua));
+}
+
 export function ubahStatusTopik(dokId: string, topikId: string, status: TopikDokumen['status']): DokumenUpload | null {
   const semua = getDokumenUpload();
   const dok = semua.find((d) => d.id === dokId);
@@ -139,20 +153,59 @@ export function ubahStatusTopik(dokId: string, topikId: string, status: TopikDok
   return dok;
 }
 
+export const BATAS_SELESAI = 70; // BR-13
+export const BATAS_LEMAH = 60; // BR-13
+
+export type StatusTopik = "belum" | "selesai" | "lemah";
+
+/**
+ * BR-13: belum = belum pernah latihan; selesai = pernah skor >= 70 dan skor
+ * terakhir >= 60; lemah = selain itu.
+ */
+export function statusTopik(t: TopikDokumen): StatusTopik {
+  const semuaSkor = t.riwayatSkor?.map((r) => r.skor) ?? (t.skorTerakhir !== undefined ? [t.skorTerakhir] : []);
+  if (semuaSkor.length === 0) return "belum";
+  const terakhir = semuaSkor[semuaSkor.length - 1];
+  return Math.max(...semuaSkor) >= BATAS_SELESAI && terakhir >= BATAS_LEMAH ? "selesai" : "lemah";
+}
+
+/** BR-14 (progres %), BR-15 (rata-rata skor terakhir topik yang pernah dilatih). */
+export function ringkasDokumen(d: DokumenUpload) {
+  const status = d.topik.map(statusTopik);
+  const selesai = status.filter((s) => s === "selesai").length;
+  const lemah = status.filter((s) => s === "lemah").length;
+  const dilatih = d.topik.filter((t) => t.skorTerakhir !== undefined);
+  const rataSkor = dilatih.length
+    ? Math.round(dilatih.reduce((a, t) => a + (t.skorTerakhir ?? 0), 0) / dilatih.length)
+    : null;
+  return {
+    total: d.topik.length,
+    selesai,
+    lemah,
+    rataSkor,
+    persen: d.topik.length ? Math.round((selesai / d.topik.length) * 100) : 0,
+  };
+}
+
+/** BR-35: topik pertama (urutan terkecil) berstatus belum atau lemah. */
+export function topikDisarankan(d: DokumenUpload): TopikDokumen | undefined {
+  return d.topik.find((t) => statusTopik(t) !== "selesai");
+}
+
 export function simpanSkorTopik(dokId: string, topikId: string, skor: number): DokumenUpload | null {
   const semua = getDokumenUpload();
   const dok = semua.find((d) => d.id === dokId);
   if (!dok) return null;
-  dok.topik = dok.topik.map((t) =>
-    t.id === topikId
-      ? {
-          ...t,
-          skorTerakhir: skor,
-          status: skor >= 70 ? 'SELESAI' : 'BERJALAN',
-          riwayatSkor: [...(t.riwayatSkor ?? []), { skor, waktu: new Date().toISOString() }],
-        }
-      : t,
-  );
+  dok.topik = dok.topik.map((t) => {
+    if (t.id !== topikId) return t;
+    const diperbarui: TopikDokumen = {
+      ...t,
+      skorTerakhir: skor,
+      riwayatSkor: [...(t.riwayatSkor ?? []), { skor, waktu: new Date().toISOString() }],
+    };
+    return { ...diperbarui, status: statusTopik(diperbarui) === "selesai" ? "SELESAI" : "BERJALAN" };
+  });
+  catatAktivitasDi(dok, topikId);
   localStorage.setItem(KEY, JSON.stringify(semua));
   return dok;
 }

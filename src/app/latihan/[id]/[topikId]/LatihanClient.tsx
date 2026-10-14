@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
-import { type DokumenUpload, getDokumenById, simpanSkorTopik } from "@/lib/dokumen";
+import { type DokumenUpload, type StatusTopik, getDokumenById, simpanSkorTopik, statusTopik } from "@/lib/dokumen";
 import { type SoalLatihan, buatSoal, pesanSkor } from "@/lib/latihan";
 import { ArrowLeft, ArrowRight, Check, RotateCcw, Sparkles, X } from "lucide-react";
 
@@ -20,6 +20,7 @@ export function LatihanClient() {
   const [diperiksa, setDiperiksa] = useState(false);
   const [benar, setBenar] = useState(0);
   const [selesai, setSelesai] = useState(false);
+  const [statusAkhir, setStatusAkhir] = useState<StatusTopik>("belum");
   const [konfirmasiKeluar, setKonfirmasiKeluar] = useState(false);
   const [riwayatJawaban, setRiwayatJawaban] = useState<{ soal: SoalLatihan; indexPilihan: number; benar: boolean }[]>([]);
 
@@ -61,7 +62,9 @@ export function LatihanClient() {
       setDiperiksa(false);
     } else {
       const total = Math.round((benar / soal.length) * 100);
-      simpanSkorTopik(id, topikId, total);
+      const dokBaru = simpanSkorTopik(id, topikId, total);
+      const topikBaru = dokBaru?.topik.find((x) => x.id === topikId);
+      setStatusAkhir(topikBaru ? statusTopik(topikBaru) : total >= BATAS_LULUS ? "selesai" : "lemah");
       setSelesai(true);
     }
   }, [idx, soal.length, benar, id, topikId]);
@@ -285,12 +288,12 @@ export function LatihanClient() {
             </p>
             <span
               className={`inline-block text-[11px] font-mono px-3 py-1 rounded-full ${
-                skor >= BATAS_LULUS
+                statusAkhir === "selesai"
                   ? "bg-primary-container text-on-primary-container"
                   : "bg-amber-500/20 text-amber-300"
               }`}
             >
-              {skor >= BATAS_LULUS ? `${topik.judul}: Selesai` : `${topik.judul}: Perlu diulang`}
+              {statusAkhir === "selesai" ? `${topik.judul}: Selesai` : `${topik.judul}: Perlu diulang`}
             </span>
             <p className="text-sm">{pesanSkor(skor)}</p>
             {/* TINJAUAN JAWABAN (S-10) */}

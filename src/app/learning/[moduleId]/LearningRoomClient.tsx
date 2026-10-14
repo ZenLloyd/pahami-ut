@@ -24,7 +24,7 @@ import {
   CheckCircle,
   FileText,
 } from "lucide-react";
-import { getDokumenById, ubahStatusTopik, type DokumenUpload } from "@/lib/dokumen";
+import { getDokumenById, ubahStatusTopik, catatAktivitas, type DokumenUpload } from "@/lib/dokumen";
 import { useEffect } from "react";
 
 import { useSearchParams } from "next/navigation";
@@ -88,9 +88,12 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
   useEffect(() => {
     if (!uploadedDoc) return;
     const t = uploadedDoc.topik[activeTopicIndex];
-    if (t && t.status === "BELUM") {
-      const hasil = ubahStatusTopik(uploadedDoc.id, t.id, "BERJALAN");
-      if (hasil) setUploadedDoc({ ...hasil });
+    if (t) {
+      catatAktivitas(uploadedDoc.id, t.id);
+      if (t.status === "BELUM") {
+        const hasil = ubahStatusTopik(uploadedDoc.id, t.id, "BERJALAN");
+        if (hasil) setUploadedDoc({ ...hasil });
+      }
     }
   }, [uploadedDoc, activeTopicIndex]);
 

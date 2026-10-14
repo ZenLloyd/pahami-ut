@@ -10,13 +10,16 @@ import {
   getDokumenById,
   hapusDokumen,
   ubahNamaDokumen,
+  statusTopik,
+  topikDisarankan,
+  ringkasDokumen,
 } from "@/lib/dokumen";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, Edit3, FileText, Trash2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BookOpen, ChevronDown, Edit3, FileText, Trash2, CheckCircle2, RotateCcw } from "lucide-react";
 
 const LABEL_STATUS = {
-  BELUM: { teks: "Belum dipelajari", kelas: "bg-surface-variant text-on-surface-variant" },
-  BERJALAN: { teks: "Sedang dipelajari", kelas: "bg-tertiary-container text-on-surface" },
-  SELESAI: { teks: "Selesai", kelas: "bg-primary-container text-on-primary-container" },
+  belum: { teks: "Belum dipelajari", kelas: "bg-surface-variant text-on-surface-variant" },
+  selesai: { teks: "Selesai", kelas: "bg-primary-container text-on-primary-container" },
+  lemah: { teks: "Perlu diulang", kelas: "bg-amber-500/20 text-amber-300" },
 } as const;
 
 export function DetailDokumenClient() {
@@ -84,86 +87,174 @@ export function DetailDokumenClient() {
 
         {dok && (
           <>
-            <header className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
-                <FileText className="w-6 h-6" />
+            <header className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-mono text-primary">Layar S-07 • Detail Dokumen</p>
+                  <h1 className="text-2xl font-bold tracking-tight break-words">{dok.judul}</h1>
+                  <p className="text-xs font-mono text-on-surface-variant mt-1">
+                    {dok.totalHalaman} halaman • {formatUkuran(dok.ukuranBytes)} • {dok.topik.length} kegiatan belajar
+                  </p>
+                  <p className="text-[11px] text-on-surface-variant mt-1">
+                    {dok.topikTerdeteksi
+                      ? "Topik dikenali dari judul “Kegiatan Belajar” di PDF."
+                      : "Judul Kegiatan Belajar tidak ditemukan di PDF, jadi dokumen dibagi rata."}{" "}
+                    Ringkasan disusun otomatis dari kalimat terpenting, belum memakai AI.
+                  </p>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-mono text-primary">Layar S-07 • Detail Dokumen</p>
-                <h1 className="text-2xl font-bold tracking-tight break-words">{dok.judul}</h1>
-                <p className="text-xs font-mono text-on-surface-variant mt-1">
-                  {dok.totalHalaman} halaman • {formatUkuran(dok.ukuranBytes)} • {dok.topik.length} kegiatan belajar
-                </p>
-                <p className="text-[11px] text-on-surface-variant mt-1">
-                  {dok.topikTerdeteksi
-                    ? "Topik dikenali dari judul “Kegiatan Belajar” di PDF."
-                    : "Judul Kegiatan Belajar tidak ditemukan di PDF, jadi dokumen dibagi rata."}{" "}
-                  Ringkasan disusun otomatis dari kalimat terpenting, belum memakai AI.
-                </p>
-              </div>
+
+              {/* Tombol Tanya AI tentang dokumen ini (S-07) */}
+              <Link
+                href={`/learning/${dok.id}?tanya=${encodeURIComponent(`Jelaskan ringkasan materi dari modul ${dok.judul}`)}`}
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-primary border border-primary/30 font-semibold text-xs transition shrink-0"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Tanya AI tentang dokumen ini</span>
+              </Link>
             </header>
+
+            {/* Kartu Progres S-07 (BR-14, BR-15) */}
+            {(() => {
+              const r = ringkasDokumen(dok);
+              return (
+                <section className="rounded-2xl border border-outline-variant bg-surface-container p-5 space-y-3">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div>
+                      <h2 className="text-sm font-semibold">Progres Belajar Dokumen Ini</h2>
+                      <p className="text-xs text-on-surface-variant font-mono mt-0.5">
+                        {r.selesai} dari {r.total} topik selesai • {r.persen}% penguasaan
+                      </p>
+                    </div>
+                    <Link
+                      href="/progres"
+                      className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Buka Halaman Progres (S-12) <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                  <div className="w-full bg-surface-variant h-2.5 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-300"
+                      style={{ width: `${r.persen}%` }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1 text-xs">
+                    <div className="p-2.5 rounded-xl bg-surface border border-outline-variant/60">
+                      <span className="text-on-surface-variant block text-[11px]">Rata-rata Skor</span>
+                      <span className="font-mono font-bold text-on-surface text-sm">
+                        {r.rataSkor !== null ? `${r.rataSkor}/100` : "-"}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-surface border border-outline-variant/60">
+                      <span className="text-on-surface-variant block text-[11px]">Perlu Penguatan</span>
+                      <span className="font-mono font-bold text-amber-300 text-sm">
+                        {r.lemah} Topik
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-surface border border-outline-variant/60 col-span-2 sm:col-span-1">
+                      <span className="text-on-surface-variant block text-[11px]">Status Dokumen</span>
+                      <span className="font-mono font-semibold text-primary text-xs">
+                        Siap Dipelajari
+                      </span>
+                    </div>
+                  </div>
+                </section>
+              );
+            })()}
 
             <section className="space-y-3">
               <h2 className="text-sm font-semibold">Jalur Belajar</h2>
               <ol className="space-y-2.5">
-                {dok.topik.map((t, i) => {
-                  const st = LABEL_STATUS[t.status];
-                  return (
-                    <li
-                      key={t.id}
-                      className="rounded-2xl border border-outline-variant bg-surface-container overflow-hidden"
-                    >
-                      <details className="group">
-                        <summary className="flex items-center gap-3 p-4 cursor-pointer list-none min-h-14 [&::-webkit-details-marker]:hidden">
-                          <span className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-mono shrink-0">
-                            {i + 1}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold">{t.judul}</p>
-                            <p className="text-[11px] font-mono text-on-surface-variant">
-                              Hal. {t.halamanMulai}–{t.halamanAkhir}
-                            </p>
-                          </div>
-                          <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full shrink-0 ${st.kelas}`}>
-                            {st.teks}
-                            {t.skorTerakhir !== undefined ? ` • ${t.skorTerakhir}` : ""}
-                          </span>
-                          <ChevronDown className="w-4 h-4 text-on-surface-variant shrink-0 transition group-open:rotate-180" />
-                        </summary>
-                        <div className="px-4 pb-4 pt-1 space-y-3 border-t border-outline-variant/60">
-                          {t.ringkasan && t.ringkasan.length > 0 ? (
-                            <>
-                              <p className="text-[11px] font-mono text-primary pt-3">
-                                Ringkasan otomatis
+                {(() => {
+                  const disarankan = topikDisarankan(dok);
+                  return dok.topik.map((t, i) => {
+                    const stKey = statusTopik(t);
+                    const st = LABEL_STATUS[stKey];
+                    const isDisarankan = disarankan?.id === t.id;
+                    return (
+                      <li
+                        key={t.id}
+                        className="rounded-2xl border border-outline-variant bg-surface-container overflow-hidden"
+                      >
+                        <details className="group">
+                          <summary className="flex items-center gap-3 p-4 cursor-pointer list-none min-h-14 [&::-webkit-details-marker]:hidden">
+                            <span className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-mono shrink-0">
+                              {i + 1}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="text-sm font-semibold">{t.judul}</p>
+                                {isDisarankan && (
+                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
+                                    Disarankan
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] font-mono text-on-surface-variant">
+                                Hal. {t.halamanMulai}–{t.halamanAkhir}
                               </p>
-                              <ul className="space-y-2 list-disc pl-4 text-xs leading-relaxed text-on-surface">
-                                {t.ringkasan.map((k, j) => (
-                                  <li key={j}>{k}</li>
-                                ))}
-                              </ul>
-                              {t.kataKunci && t.kataKunci.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 pt-1">
-                                  {t.kataKunci.map((w) => (
-                                    <span
-                                      key={w}
-                                      className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface-container-high border border-outline-variant"
-                                    >
-                                      {w}
-                                    </span>
+                            </div>
+                            <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full shrink-0 ${st.kelas}`}>
+                              {st.teks}
+                              {t.skorTerakhir !== undefined ? ` • ${t.skorTerakhir}` : ""}
+                            </span>
+                            <ChevronDown className="w-4 h-4 text-on-surface-variant shrink-0 transition group-open:rotate-180" />
+                          </summary>
+                          <div className="px-4 pb-4 pt-1 space-y-3 border-t border-outline-variant/60">
+                            {t.ringkasan && t.ringkasan.length > 0 ? (
+                              <>
+                                <p className="text-[11px] font-mono text-primary pt-3">
+                                  Ringkasan otomatis
+                                </p>
+                                <ul className="space-y-2 list-disc pl-4 text-xs leading-relaxed text-on-surface">
+                                  {t.ringkasan.map((k, j) => (
+                                    <li key={j}>{k}</li>
                                   ))}
-                                </div>
-                              )}
-                            </>
-                          ) : (
-                            <p className="text-xs text-on-surface-variant pt-3">
-                              Bagian ini tidak memiliki cukup teks untuk diringkas.
-                            </p>
-                          )}
-                        </div>
-                      </details>
-                    </li>
-                  );
-                })}
+                                </ul>
+                                {t.kataKunci && t.kataKunci.length > 0 && (
+                                  <div className="flex flex-wrap gap-1.5 pt-1">
+                                    {t.kataKunci.map((w) => (
+                                      <span
+                                        key={w}
+                                        className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface-container-high border border-outline-variant"
+                                      >
+                                        {w}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <p className="text-xs text-on-surface-variant pt-3">
+                                Bagian ini tidak memiliki cukup teks untuk diringkas.
+                              </p>
+                            )}
+
+                            {/* Tombol Pelajari (-> S-08) & Latihan (-> S-09) sesuai S-07 */}
+                            <div className="flex items-center gap-2 pt-2 border-t border-outline-variant/40 flex-wrap">
+                              <Link
+                                href={`/learning/${dok.id}`}
+                                className="min-h-10 px-4 rounded-full bg-primary text-on-primary text-xs font-semibold inline-flex items-center gap-1.5 hover:opacity-90 transition"
+                              >
+                                <BookOpen className="w-3.5 h-3.5" /> Pelajari Topik
+                              </Link>
+                              <Link
+                                href={`/latihan/${dok.id}/${t.id}`}
+                                className="min-h-10 px-4 rounded-full border border-outline-variant bg-surface-container-high text-on-surface text-xs font-medium inline-flex items-center gap-1.5 hover:bg-surface-variant transition"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5" /> Latihan
+                              </Link>
+                            </div>
+                          </div>
+                        </details>
+                      </li>
+                    );
+                  });
+                })()}
               </ol>
             </section>
 

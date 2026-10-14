@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
-import { type DokumenUpload, getDokumenUpload } from "@/lib/dokumen";
-import { ArrowRight, RotateCcw } from "lucide-react";
-
-const BATAS_LULUS = 70; // BR-13
+import { type DokumenUpload, getDokumenUpload, statusTopik, ringkasDokumen, BATAS_SELESAI } from "@/lib/dokumen";
+import { ArrowRight, RotateCcw, CheckCircle2 } from "lucide-react";
+import { SYSTEM_MESSAGES as MSG } from "@/lib/messages";
 
 function formatWaktu(iso: string) {
   return new Date(iso).toLocaleString("id-ID", {
@@ -31,14 +30,11 @@ export function ProgresClient() {
 
   const dok = daftar.find((d) => d.id === dipilih) ?? null;
   const topik = dok?.topik ?? [];
+  const r = dok ? ringkasDokumen(dok) : { total: 0, selesai: 0, lemah: 0, rataSkor: null, persen: 0 };
   const dikerjakan = topik.filter((t) => t.skorTerakhir !== undefined);
-  const selesai = topik.filter((t) => t.status === "SELESAI").length;
-  const rata = dikerjakan.length
-    ? Math.round(dikerjakan.reduce((a, t) => a + (t.skorTerakhir ?? 0), 0) / dikerjakan.length)
-    : 0;
-  const perluPenguatan = dikerjakan.filter((t) => (t.skorTerakhir ?? 0) < BATAS_LULUS);
+  const perluPenguatan = topik.filter((t) => statusTopik(t) === "lemah");
   const riwayat = topik
-    .flatMap((t) => (t.riwayatSkor ?? []).map((r) => ({ ...r, judul: t.judul })))
+    .flatMap((t) => (t.riwayatSkor ?? []).map((rw) => ({ ...rw, judul: t.judul })))
     .sort((a, b) => b.waktu.localeCompare(a.waktu))
     .slice(0, 10);
 
@@ -87,9 +83,9 @@ export function ProgresClient() {
 
             <section className="grid grid-cols-3 gap-3">
               {[
-                { label: "Topik selesai", nilai: `${selesai}/${topik.length}` },
-                { label: "Latihan dikerjakan", nilai: `${dikerjakan.length}/${topik.length}` },
-                { label: "Rata-rata skor", nilai: dikerjakan.length ? String(rata) : "-" },
+                { label: "Topik selesai", nilai: `${r.selesai}/${r.total}` },
+                { label: "Latihan dikerjakan", nilai: `${dikerjakan.length}/${r.total}` },
+                { label: "Rata-rata skor", nilai: r.rataSkor !== null ? String(r.rataSkor) : "-" },
               ].map((k) => (
                 <div key={k.label} className="rounded-2xl border border-outline-variant bg-surface-container p-4">
                   <p className="text-2xl font-bold font-mono text-primary">{k.nilai}</p>
@@ -101,12 +97,13 @@ export function ProgresClient() {
             <section className="rounded-2xl border border-outline-variant bg-surface-container p-5 space-y-4">
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold">Skor Terakhir per Topik</h2>
-                <span className="text-[10px] font-mono text-on-surface-variant">garis = batas {BATAS_LULUS}</span>
+                <span className="text-[10px] font-mono text-on-surface-variant">garis = batas {BATAS_SELESAI}</span>
               </div>
               <ul className="space-y-3">
                 {topik.map((t) => {
                   const skor = t.skorTerakhir;
-                  const lulus = skor !== undefined && skor >= BATAS_LULUS;
+                  const st = statusTopik(t);
+                  const lulus = st === "selesai";
                   return (
                     <li key={t.id} className="space-y-1">
                       <div className="flex items-center justify-between gap-2 text-xs">
@@ -128,7 +125,7 @@ export function ProgresClient() {
                         )}
                         <div
                           className="absolute top-0 bottom-0 w-0.5 bg-on-surface/60"
-                          style={{ left: `${BATAS_LULUS}%` }}
+                          style={{ left: `${BATAS_SELESAI}%` }}
                         />
                       </div>
                     </li>
@@ -137,9 +134,10 @@ export function ProgresClient() {
               </ul>
             </section>
 
-            {perluPenguatan.length > 0 && (
-              <section className="rounded-2xl border border-outline-variant bg-surface-container p-5 space-y-3">
-                <h2 className="text-sm font-semibold">Perlu Penguatan</h2>
+            {/* DAFTAR PERLU PENGUATAN (BR-13) / MSG-E03 */}
+            <section className="rounded-2xl border border-outline-variant bg-surface-container p-5 space-y-3">
+              <h2 className="text-sm font-semibold">Perlu Penguatan</h2>
+              {perluPenguatan.length > 0 ? (
                 <ul className="space-y-2">
                   {perluPenguatan.map((t) => (
                     <li
@@ -148,7 +146,9 @@ export function ProgresClient() {
                     >
                       <div className="text-xs">
                         <p className="font-semibold">{t.judul}</p>
-                        <p className="text-on-surface-variant font-mono">skor {t.skorTerakhir}, batas {BATAS_LULUS}</p>
+                        <p className="text-on-surface-variant font-mono">
+                          skor terakhir {t.skorTerakhir ?? "-"}, batas {BATAS_SELESAI}
+                        </p>
                       </div>
                       <div className="flex gap-2">
                         <Link
@@ -167,8 +167,13 @@ export function ProgresClient() {
                     </li>
                   ))}
                 </ul>
-              </section>
-            )}
+              ) : (
+                <div className="p-4 rounded-xl bg-surface border border-outline-variant/60 flex items-center gap-2.5 text-xs text-primary">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>{MSG.MSG_E03}</span>
+                </div>
+              )}
+            </section>
 
             <section className="rounded-2xl border border-outline-variant bg-surface-container p-5 space-y-3">
               <h2 className="text-sm font-semibold">Riwayat Latihan</h2>
@@ -186,7 +191,7 @@ export function ProgresClient() {
                       </div>
                       <span
                         className={`font-mono px-2.5 py-0.5 rounded-full text-[11px] ${
-                          r.skor >= BATAS_LULUS ? "bg-primary-container text-on-primary-container" : "bg-error/15 text-error"
+                          r.skor >= BATAS_SELESAI ? "bg-primary-container text-on-primary-container" : "bg-error/15 text-error"
                         }`}
                       >
                         {r.skor}
