@@ -10,12 +10,14 @@ export interface Pengguna {
   role: "mahasiswa" | "admin";
   isAktif: boolean;
   dibuatPada: string;
+  terakhirAktif?: string;
+  jumlahDokumen?: number;
 }
 
 const STORAGE_KEY_USERS = "pahami_users_db";
 const STORAGE_KEY_SESSION = "pahami_session";
 const STORAGE_KEY_VERSION = "pahami_db_version";
-const DB_VERSION = "v2_budsant";
+const DB_VERSION = "v3_pengguna_s15";
 
 // Data Awal Bawaan Sistem
 const DEFAULT_USERS: Pengguna[] = [
@@ -25,7 +27,39 @@ const DEFAULT_USERS: Pengguna[] = [
     kataSandi: "rahasia123",
     role: "mahasiswa",
     isAktif: true,
-    dibuatPada: "2026-10-08T00:00:00Z",
+    dibuatPada: "2026-10-01T08:00:00Z",
+    terakhirAktif: "2026-10-14T19:30:00Z",
+    jumlahDokumen: 1,
+  },
+  {
+    nama: "Anisa Putri",
+    email: "anisaputri@ecampus.ut.ac.id",
+    kataSandi: "rahasia123",
+    role: "mahasiswa",
+    isAktif: true,
+    dibuatPada: "2026-10-03T10:15:00Z",
+    terakhirAktif: "2026-10-13T14:20:00Z",
+    jumlahDokumen: 4,
+  },
+  {
+    nama: "Joko Susilo",
+    email: "josusilo@ecampus.ut.ac.id",
+    kataSandi: "rahasia123",
+    role: "mahasiswa",
+    isAktif: true,
+    dibuatPada: "2026-10-05T11:45:00Z",
+    terakhirAktif: "2026-10-12T16:00:00Z",
+    jumlahDokumen: 3,
+  },
+  {
+    nama: "Siti Rahma",
+    email: "siti.rahma@ecampus.ut.ac.id",
+    kataSandi: "rahasia123",
+    role: "mahasiswa",
+    isAktif: true,
+    dibuatPada: "2026-10-06T09:30:00Z",
+    terakhirAktif: "2026-10-10T11:10:00Z",
+    jumlahDokumen: 2,
   },
   {
     nama: "Budi Santoso",
@@ -33,7 +67,9 @@ const DEFAULT_USERS: Pengguna[] = [
     kataSandi: "rahasia123",
     role: "mahasiswa",
     isAktif: false, // BR-23: Akun nonaktif
-    dibuatPada: "2026-10-08T00:00:00Z",
+    dibuatPada: "2026-10-07T13:00:00Z",
+    terakhirAktif: "2026-10-08T08:45:00Z",
+    jumlahDokumen: 1,
   },
   {
     nama: "Admin Pengelola",
@@ -41,7 +77,8 @@ const DEFAULT_USERS: Pengguna[] = [
     kataSandi: "admin123",
     role: "admin",
     isAktif: true,
-    dibuatPada: "2026-10-08T00:00:00Z",
+    dibuatPada: "2026-09-01T00:00:00Z",
+    terakhirAktif: "2026-10-14T20:00:00Z",
   },
 ];
 
@@ -183,4 +220,41 @@ export function ubahKataSandi(
   if (user.kataSandi !== sandiLama) return { ok: false, alasan: "SANDI_LAMA_SALAH" };
   simpanPerubahanPengguna(emailAkun, (u) => ({ ...u, kataSandi: sandiBaru }));
   return { ok: true };
+}
+
+/**
+ * BP-11 & BR-23: Aktifkan / Nonaktifkan akun pengguna oleh Admin.
+ * BR-24: Akun admin tidak dapat dinonaktifkan.
+ */
+export function toggleStatusPengguna(
+  emailTarget: string
+): { ok: true; user: Pengguna } | { ok: false; alasan: string } {
+  const users = getDaftarPengguna();
+  const idx = users.findIndex((u) => u.email.toLowerCase() === emailTarget.toLowerCase());
+  if (idx === -1) return { ok: false, alasan: "Pengguna tidak ditemukan." };
+
+  const target = users[idx];
+  if (target.role === "admin") {
+    return { ok: false, alasan: "Akun admin tidak dapat dinonaktifkan (BR-24)." };
+  }
+
+  const baru: Pengguna = {
+    ...target,
+    isAktif: !target.isAktif,
+  };
+  users[idx] = baru;
+  localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+
+  // Jika akun target yang sedang login, akhiri sesinya bila dinonaktifkan (BR-23)
+  const sesi = getSesiSaatIni();
+  if (sesi && sesi.email.toLowerCase() === target.email.toLowerCase()) {
+    if (!baru.isAktif) {
+      hapusSesi();
+    } else {
+      localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(baru));
+    }
+    window.dispatchEvent(new Event(EVENT_SESI_BERUBAH));
+  }
+
+  return { ok: true, user: baru };
 }

@@ -24,6 +24,12 @@ export const SYSTEM_MESSAGES = {
   MSG_P02: "Kata sandi berhasil diubah.",
   MSG_P03: "Kata sandi lama tidak sesuai.",
 
+  // Pengelolaan Pengguna Admin (MSG-Mxx) & Kuota (MSG-Sxx)
+  MSG_M01: (nama: string) => `Nonaktifkan akun ${nama}? Pengguna tidak akan bisa masuk sampai diaktifkan kembali.`,
+  MSG_M02: (nama: string) => `Akun ${nama} berhasil dinonaktifkan.`,
+  MSG_M03: (nama: string) => `Akun ${nama} berhasil diaktifkan kembali.`,
+  MSG_S01: "Pengaturan kuota berhasil disimpan.",
+
   // Dokumen & Upload (MSG-Uxx)
   MSG_U01: "Hanya file PDF yang dapat diunggah.",
   MSG_U02: (maxMb: number) => `Ukuran file melebihi batas ${maxMb} MB.`,

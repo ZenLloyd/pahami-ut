@@ -3,16 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LogoutModal } from "@/components/LogoutModal";
-import { LogoUT } from "@/components/LogoUT";
+import { AdminNavbar } from "@/components/AdminNavbar";
 import {
   Users,
   FileText,
   MessageSquare,
   DollarSign,
   ShieldAlert,
-  LogOut,
   TrendingUp,
   Settings,
   UserCheck,
@@ -22,7 +19,6 @@ import {
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [rentangHari, setRentangHari] = useState<"7" | "30">("7");
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Mock Data Pengguna Terbaru
   const penggunaTerbaru = [
@@ -66,51 +62,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col font-sans selection:bg-primary-container selection:text-on-primary-container">
       {/* TOP HEADER ADMIN */}
-      <header className="h-16 border-b border-outline-variant bg-surface-container px-4 sm:px-6 flex items-center justify-between shrink-0 sticky top-0 z-50">
-        <div className="flex items-center gap-6">
-          <Link href="/admin" className="flex items-center gap-2.5">
-            <LogoUT />
-            <span className="font-semibold text-base text-on-surface tracking-tight">
-              Pahami Admin
-            </span>
-            <span className="text-[10px] font-mono text-primary bg-primary-container/60 px-2.5 py-0.5 rounded-full border border-primary/30 hidden sm:inline">
-              Role: Admin
-            </span>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-1.5 text-xs">
-            <span className="px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-semibold">
-              Dashboard (S-14)
-            </span>
-            <button
-              onClick={() => alert("Menu Pengguna (S-15) akan dibuka pada sprint manajemen pengguna.")}
-              className="px-3 py-1.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition cursor-pointer"
-            >
-              Pengguna (S-15)
-            </button>
-            <button
-              onClick={() => alert("Menu Pengaturan Kuota (S-16) akan dibuka pada sprint pengaturan.")}
-              className="px-3 py-1.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition cursor-pointer"
-            >
-              Pengaturan Kuota (S-16)
-            </button>
-          </nav>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-on-surface-variant hidden sm:inline font-mono">
-            admin@ecampus.ut.ac.id
-          </span>
-          <ThemeToggle />
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="px-3 py-1.5 rounded-full bg-surface-container-high hover:bg-surface-variant text-error text-xs font-medium border border-outline-variant transition flex items-center gap-1.5 cursor-pointer"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Keluar</span>
-          </button>
-        </div>
-      </header>
+      <AdminNavbar />
 
       {/* MAIN CONTENT S-14 */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 md:p-8 pb-20 md:pb-8 space-y-6">
@@ -322,14 +274,6 @@ export default function AdminDashboardPage() {
           </div>
         </section>
       </main>
-
-      {/* Dialog Konfirmasi Keluar M3 Admin */}
-      <LogoutModal
-        isOpen={showLogoutModal}
-        onClose={() => setShowLogoutModal(false)}
-        userName="Administrator UT"
-        userRole="Admin"
-      />
     </div>
   );
 }
