@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/BottomNav";
 import { LogoutModal } from "@/components/LogoutModal";
 import { LogoUT } from "@/components/LogoUT";
-import { BookOpen, Layers, CheckCircle2, BarChart3, Search, LogOut } from "lucide-react";
+import { BookOpen, Layers, BarChart3, Search, LogOut } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -53,14 +53,6 @@ export function Navbar() {
               <BookOpen className="w-3.5 h-3.5" />
               Ruang Belajar
             </Link>
-
-            <button
-              onClick={() => alert("Fitur Bank Soal & Kuis akan hadir di Paket Fitur 4.")}
-              className="px-3 py-1.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Latihan
-            </button>
 
             <Link
               href="/progres"
