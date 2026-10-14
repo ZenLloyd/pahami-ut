@@ -235,45 +235,37 @@ export function PenggunaClient() {
         <section className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
           {/* Filter Tab M3 */}
           <div className="flex items-center gap-1.5 bg-surface-container p-1 rounded-full border border-outline-variant text-xs self-start sm:self-auto">
-            <button
-              onClick={() => setFilter("SEMUA")}
-              className={`px-3 py-1.5 rounded-full font-medium transition cursor-pointer flex items-center gap-1.5 ${
-                filter === "SEMUA"
-                  ? "bg-primary text-on-primary font-semibold"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <span>Semua</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-surface-container-high/80">
-                {totalPengguna}
-              </span>
-            </button>
-            <button
-              onClick={() => setFilter("AKTIF")}
-              className={`px-3 py-1.5 rounded-full font-medium transition cursor-pointer flex items-center gap-1.5 ${
-                filter === "AKTIF"
-                  ? "bg-primary text-on-primary font-semibold"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <span>Aktif</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-surface-container-high/80">
-                {totalAktif}
-              </span>
-            </button>
-            <button
-              onClick={() => setFilter("NONAKTIF")}
-              className={`px-3 py-1.5 rounded-full font-medium transition cursor-pointer flex items-center gap-1.5 ${
-                filter === "NONAKTIF"
-                  ? "bg-primary text-on-primary font-semibold"
-                  : "text-on-surface-variant hover:text-on-surface"
-              }`}
-            >
-              <span>Nonaktif</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-surface-container-high/80">
-                {totalNonaktif}
-              </span>
-            </button>
+            {(
+              [
+                { id: "SEMUA", label: "Semua", count: totalPengguna },
+                { id: "AKTIF", label: "Aktif", count: totalAktif },
+                { id: "NONAKTIF", label: "Nonaktif", count: totalNonaktif },
+              ] as const
+            ).map((tab) => {
+              const isActive = filter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setFilter(tab.id)}
+                  className={`px-3 py-1.5 rounded-full font-medium transition cursor-pointer flex items-center gap-1.5 ${
+                    isActive
+                      ? "bg-primary text-on-primary font-semibold shadow-xs"
+                      : "text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/40"
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  <span
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold transition ${
+                      isActive
+                        ? "bg-on-primary/20 text-on-primary"
+                        : "bg-surface-variant text-on-surface"
+                    }`}
+                  >
+                    {tab.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Kolom Pencarian Nama atau Email */}
