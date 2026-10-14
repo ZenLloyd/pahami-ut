@@ -1,18 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { mockStudent } from "@/data/mockData";
+import { getSesiSaatIni, EVENT_SESI_BERUBAH } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/BottomNav";
 import { LogoutModal } from "@/components/LogoutModal";
 import { LogoUT } from "@/components/LogoUT";
-import { Layers, BarChart3, Upload, Search, LogOut } from "lucide-react";
+import { Layers, BarChart3, Upload, LogOut } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [nama, setNama] = useState("Mahasiswa");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    const muat = () => {
+      const s = getSesiSaatIni();
+      if (s) {
+        setNama(s.nama);
+        setEmail(s.email);
+      }
+    };
+    muat();
+    window.addEventListener(EVENT_SESI_BERUBAH, muat);
+    return () => window.removeEventListener(EVENT_SESI_BERUBAH, muat);
+  }, []);
 
   return (
     <>
@@ -70,38 +85,21 @@ export function Navbar() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            onClick={() => alert("Pencarian cerdas teks modul: Tekan ⌘K")}
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface border border-outline-variant text-xs text-on-surface-variant hover:text-on-surface transition"
-          >
-            <Search className="w-3.5 h-3.5" />
-            <span>Cari materi</span>
-            <kbd className="px-1.5 py-0.5 text-[10px] bg-surface-container-high border border-outline-variant rounded text-on-surface-variant font-mono">
-              ⌘K
-            </kbd>
-          </button>
-
-          <div className="h-4 w-[1px] bg-outline-variant hidden sm:block"></div>
-
           {/* Theme Toggle (Dark / Light M3) */}
           <ThemeToggle />
 
           <div className="h-4 w-[1px] bg-outline-variant"></div>
 
-          {/* User Profile Pill */}
-          <div className="flex items-center gap-2 pl-0.5 sm:pl-1">
+          {/* User Profile Pill -> S-13 */}
+          <Link href="/profil" className="flex items-center gap-2 pl-0.5 sm:pl-1 hover:opacity-85 transition">
             <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container font-bold flex items-center justify-center text-xs shadow-sm">
-              {mockStudent.name.slice(0, 2).toUpperCase()}
+              {nama.slice(0, 2).toUpperCase()}
             </div>
             <div className="hidden lg:block text-left">
-              <div className="text-xs font-semibold text-on-surface leading-tight">
-                {mockStudent.name}
-              </div>
-              <div className="text-[10px] font-mono text-on-surface-variant">
-                NIM: {mockStudent.nim}
-              </div>
+              <div className="text-xs font-semibold text-on-surface leading-tight">{nama}</div>
+              <div className="text-[10px] font-mono text-on-surface-variant">{email}</div>
             </div>
-          </div>
+          </Link>
 
           {/* Tombol Keluar Mahasiswa (Sama Seperti di Admin) */}
           <button
@@ -116,13 +114,13 @@ export function Navbar() {
       </header>
 
       {/* Bar Bawah Khusus HP (M3 Compact Window Class) */}
-      <BottomNav onOpenLogout={() => setShowLogoutModal(true)} />
+      <BottomNav />
 
       {/* Dialog Konfirmasi Keluar M3 */}
       <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
-        userName={mockStudent.name}
+        userName={nama}
         userRole="Mahasiswa"
       />
     </>

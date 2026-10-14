@@ -19,6 +19,11 @@ export const SYSTEM_MESSAGES = {
   MSG_A07: "Kata sandi berhasil diubah. Silakan masuk dengan kata sandi baru.",
   MSG_A08: "Tautan sudah kedaluwarsa atau sudah dipakai. Minta tautan baru.",
 
+  // Profil (MSG-Pxx)
+  MSG_P01: "Profil berhasil disimpan.",
+  MSG_P02: "Kata sandi berhasil diubah.",
+  MSG_P03: "Kata sandi lama tidak sesuai.",
+
   // Dokumen & Upload (MSG-Uxx)
   MSG_U01: "Hanya file PDF yang dapat diunggah.",
   MSG_U02: (maxMb: number) => `Ukuran file melebihi batas ${maxMb} MB.`,

@@ -151,3 +151,36 @@ export function hapusSesi(): void {
     localStorage.removeItem(STORAGE_KEY_SESSION);
   }
 }
+
+/** Dikirim ke window setiap data sesi berubah, agar Navbar ikut diperbarui. */
+export const EVENT_SESI_BERUBAH = "pahami:sesi-berubah";
+
+function simpanPerubahanPengguna(emailAkun: string, ubah: (u: Pengguna) => Pengguna): Pengguna | null {
+  const users = getDaftarPengguna();
+  const idx = users.findIndex((u) => u.email.toLowerCase() === emailAkun.toLowerCase());
+  if (idx === -1) return null;
+  const baru = ubah(users[idx]);
+  users[idx] = baru;
+  localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+  localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(baru));
+  window.dispatchEvent(new Event(EVENT_SESI_BERUBAH));
+  return baru;
+}
+
+/** BP-10: ubah nama (3-60 karakter, divalidasi oleh pemanggil). Email tidak dapat diubah (BR-36). */
+export function ubahNamaPengguna(emailAkun: string, namaBaru: string): Pengguna | null {
+  return simpanPerubahanPengguna(emailAkun, (u) => ({ ...u, nama: namaBaru.trim() }));
+}
+
+/** BP-10: ubah kata sandi setelah sandi lama diverifikasi. */
+export function ubahKataSandi(
+  emailAkun: string,
+  sandiLama: string,
+  sandiBaru: string,
+): { ok: true } | { ok: false; alasan: "SANDI_LAMA_SALAH" | "AKUN_TIDAK_ADA" } {
+  const user = getDaftarPengguna().find((u) => u.email.toLowerCase() === emailAkun.toLowerCase());
+  if (!user) return { ok: false, alasan: "AKUN_TIDAK_ADA" };
+  if (user.kataSandi !== sandiLama) return { ok: false, alasan: "SANDI_LAMA_SALAH" };
+  simpanPerubahanPengguna(emailAkun, (u) => ({ ...u, kataSandi: sandiBaru }));
+  return { ok: true };
+}
