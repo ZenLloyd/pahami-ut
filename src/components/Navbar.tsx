@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/BottomNav";
 import { LogoutModal } from "@/components/LogoutModal";
 import { LogoUT } from "@/components/LogoUT";
-import { BookOpen, Layers, CheckCircle2, History, Search, LogOut } from "lucide-react";
+import { BookOpen, Layers, CheckCircle2, BarChart3, Search, LogOut } from "lucide-react";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -62,13 +62,17 @@ export function Navbar() {
               Latihan
             </button>
 
-            <button
-              onClick={() => alert("Fitur Riwayat Sitasi AI akan hadir di Paket Fitur 3.")}
-              className="px-3 py-1.5 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition flex items-center gap-1.5 cursor-pointer"
+            <Link
+              href="/progres"
+              className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition ${
+                pathname === "/progres"
+                  ? "bg-primary-container text-on-primary-container font-semibold"
+                  : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+              }`}
             >
-              <History className="w-3.5 h-3.5" />
-              Riwayat
-            </button>
+              <BarChart3 className="w-3.5 h-3.5" />
+              Progres
+            </Link>
           </nav>
         </div>
 

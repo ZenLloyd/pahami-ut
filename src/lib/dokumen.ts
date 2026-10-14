@@ -17,6 +17,7 @@ export interface TopikDokumen {
   kataKunci?: string[];
   kalimatLatihan?: string[];
   skorTerakhir?: number;
+  riwayatSkor?: { skor: number; waktu: string }[]; // ISO, terlama -> terbaru
 }
 
 export interface DokumenUpload {
@@ -143,7 +144,14 @@ export function simpanSkorTopik(dokId: string, topikId: string, skor: number): D
   const dok = semua.find((d) => d.id === dokId);
   if (!dok) return null;
   dok.topik = dok.topik.map((t) =>
-    t.id === topikId ? { ...t, skorTerakhir: skor, status: skor >= 70 ? 'SELESAI' : 'BERJALAN' } : t,
+    t.id === topikId
+      ? {
+          ...t,
+          skorTerakhir: skor,
+          status: skor >= 70 ? 'SELESAI' : 'BERJALAN',
+          riwayatSkor: [...(t.riwayatSkor ?? []), { skor, waktu: new Date().toISOString() }],
+        }
+      : t,
   );
   localStorage.setItem(KEY, JSON.stringify(semua));
   return dok;

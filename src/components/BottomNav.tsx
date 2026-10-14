@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { mockStudent } from "@/data/mockData";
 import { LogoutModal } from "@/components/LogoutModal";
-import { BookOpen, Layers, CheckCircle2, User } from "lucide-react";
+import { BookOpen, Layers, BarChart3, User } from "lucide-react";
 
 export function BottomNav({ onOpenLogout }: { onOpenLogout?: () => void }) {
   const pathname = usePathname();
@@ -27,11 +27,10 @@ export function BottomNav({ onOpenLogout }: { onOpenLogout?: () => void }) {
       isActive: pathname.startsWith("/learning"),
     },
     {
-      label: "Latihan",
-      href: "#latihan",
-      icon: CheckCircle2,
-      isActive: false,
-      onClick: () => alert("Fitur Latihan Kuis akan aktif di Paket Fitur 4."),
+      label: "Progres",
+      href: "/progres",
+      icon: BarChart3,
+      isActive: pathname === "/progres",
     },
     {
       label: "Profil",
