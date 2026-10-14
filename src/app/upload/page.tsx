@@ -9,6 +9,7 @@ import {
   MAKS_UKURAN_MB,
   formatUkuran,
   getDokumenUpload,
+  getMaksDokumen,
   judulDariNamaFile,
   simpanDokumen,
   validasiFile,
@@ -51,15 +52,17 @@ export default function UploadPage() {
   const [persen, setPersen] = useState(0);
   const [idBaru, setIdBaru] = useState("");
   const [terpakai, setTerpakai] = useState(0);
+  const [maksDokumen, setMaksDokumen] = useState(MAKS_DOKUMEN);
 
   useEffect(() => {
     setTerpakai(getDokumenUpload().filter((d) => d.status !== "GAGAL").length);
+    setMaksDokumen(getMaksDokumen());
     return () => {
       if (timer.current) clearInterval(timer.current);
     };
   }, []);
 
-  const kuotaPenuh = terpakai >= MAKS_DOKUMEN;
+  const kuotaPenuh = terpakai >= maksDokumen;
 
   const pilihFile = useCallback((f: File | undefined | null) => {
     if (!f) return;
@@ -146,14 +149,14 @@ export default function UploadPage() {
         <div className="flex items-center justify-between text-xs font-mono rounded-xl border border-outline-variant bg-surface-container px-4 py-2.5">
           <span className="text-on-surface-variant">Kuota dokumen</span>
           <span className={kuotaPenuh ? "text-error font-semibold" : "text-primary font-semibold"}>
-            {terpakai} / {MAKS_DOKUMEN} terpakai
+            {terpakai} / {maksDokumen} terpakai
           </span>
         </div>
 
         {kuotaPenuh && fase === "AWAL" && (
           <div className="flex items-start gap-2.5 rounded-xl border border-error/40 bg-error-container/20 p-4 text-xs">
             <AlertCircle className="w-4 h-4 text-error shrink-0 mt-0.5" />
-            <p>{MSG.MSG_U03(MAKS_DOKUMEN)}</p>
+            <p>{MSG.MSG_U03(maksDokumen)}</p>
           </div>
         )}
 

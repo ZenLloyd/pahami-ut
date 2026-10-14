@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { type Pengguna, getSesiSaatIni, ubahKataSandi, ubahNamaPengguna } from "@/lib/auth";
-import { MAKS_DOKUMEN, getDokumenUpload } from "@/lib/dokumen";
+import { getDokumenUpload } from "@/lib/dokumen";
+import { getPengaturanKuota, DEFAULT_PENGATURAN_KUOTA } from "@/lib/quota";
 import { SYSTEM_MESSAGES as MSG } from "@/lib/messages";
-
-const MAKS_PERTANYAAN_HARIAN = 30; // BR-17 (nilai default)
 
 const inputKelas =
   "block w-full min-h-12 rounded-xl border border-outline-variant bg-surface px-3 text-sm text-on-surface disabled:opacity-60";
@@ -19,6 +18,8 @@ export function ProfilClient() {
   const [user, setUser] = useState<Pengguna | null>(null);
   const [siap, setSiap] = useState(false);
   const [jumlahDokumen, setJumlahDokumen] = useState(0);
+  const [maksDokumen, setMaksDokumen] = useState(DEFAULT_PENGATURAN_KUOTA.maksDokumen);
+  const [maksTanya, setMaksTanya] = useState(DEFAULT_PENGATURAN_KUOTA.maksPertanyaanAiHarian);
 
   const [nama, setNama] = useState("");
   const [errNama, setErrNama] = useState("");
@@ -35,6 +36,9 @@ export function ProfilClient() {
     setUser(s);
     if (s) setNama(s.nama);
     setJumlahDokumen(getDokumenUpload().filter((d) => d.status !== "GAGAL").length);
+    const q = getPengaturanKuota();
+    setMaksDokumen(q.maksDokumen);
+    setMaksTanya(q.maksPertanyaanAiHarian);
     setSiap(true);
   }, []);
 
@@ -82,7 +86,7 @@ export function ProfilClient() {
     setInfoSandi(MSG.MSG_P02);
   }
 
-  const persenDokumen = Math.round((jumlahDokumen / MAKS_DOKUMEN) * 100);
+  const persenDokumen = Math.round((jumlahDokumen / (maksDokumen || 1)) * 100);
   const isMahasiswa = user?.role === "mahasiswa";
 
   return (
@@ -183,7 +187,7 @@ export function ProfilClient() {
                   <div className="flex justify-between text-xs">
                     <span>Dokumen terpakai</span>
                     <span className="font-mono">
-                      {jumlahDokumen} dari {MAKS_DOKUMEN}
+                      {jumlahDokumen} dari {maksDokumen}
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-surface-variant overflow-hidden">
@@ -198,7 +202,7 @@ export function ProfilClient() {
                 </div>
                 <div className="flex justify-between text-xs">
                   <span>Pertanyaan AI hari ini</span>
-                  <span className="font-mono">0 dari {MAKS_PERTANYAAN_HARIAN}</span>
+                  <span className="font-mono">0 dari {maksTanya}</span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant">
                   Hitungan pertanyaan AI baru akurat setelah Tanya AI terhubung ke server. Kuota terisi lagi pukul 00.00 WIB.

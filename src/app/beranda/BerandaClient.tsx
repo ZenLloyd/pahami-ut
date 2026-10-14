@@ -13,6 +13,7 @@ import {
   hapusDokumen,
   formatUkuran,
   MAKS_DOKUMEN,
+  getMaksDokumen,
   BATAS_SELESAI,
 } from "@/lib/dokumen";
 import { getSesiSaatIni, EVENT_SESI_BERUBAH } from "@/lib/auth";
@@ -36,6 +37,7 @@ export function BerandaClient() {
   const [daftar, setDaftar] = useState<DokumenUpload[]>([]);
   const [namaUser, setNamaUser] = useState("Mahasiswa");
   const [siap, setSiap] = useState(false);
+  const [maksDokumen, setMaksDokumen] = useState(MAKS_DOKUMEN);
 
   // Dialog Edit & Hapus
   const [dokEdit, setDokEdit] = useState<DokumenUpload | null>(null);
@@ -49,6 +51,7 @@ export function BerandaClient() {
 
   function muatData() {
     setDaftar(getDokumenUpload());
+    setMaksDokumen(getMaksDokumen());
     const s = getSesiSaatIni();
     if (s) setNamaUser(s.nama);
   }
@@ -62,7 +65,7 @@ export function BerandaClient() {
 
   const namaDepan = namaUser.trim().split(" ")[0] || "Mahasiswa";
   const jumlahDokumen = daftar.filter((d) => d.status !== "GAGAL").length;
-  const kuotaPenuh = jumlahDokumen >= MAKS_DOKUMEN;
+  const kuotaPenuh = jumlahDokumen >= maksDokumen;
 
   // Statistik gabungan seluruh dokumen (S-06)
   const ringkasanSemua = daftar.map(ringkasDokumen);
@@ -150,7 +153,7 @@ export function BerandaClient() {
             {kuotaPenuh ? (
               <button
                 disabled
-                title={`Kuota dokumen kamu sudah penuh (${MAKS_DOKUMEN} dokumen). Hapus dokumen lama untuk mengunggah yang baru.`}
+                title={`Kuota dokumen kamu sudah penuh (${maksDokumen} dokumen). Hapus dokumen lama untuk mengunggah yang baru.`}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-surface-container border border-outline-variant text-on-surface-variant opacity-50 cursor-not-allowed text-xs font-medium"
               >
                 <Upload className="w-3.5 h-3.5" />
@@ -261,11 +264,11 @@ export function BerandaClient() {
                 <div className="text-2xl font-bold font-mono tracking-tight text-on-surface mt-2">
                   {jumlahDokumen}{" "}
                   <span className="text-sm font-normal text-on-surface-variant">
-                    / {MAKS_DOKUMEN} Kuota
+                    / {maksDokumen} Kuota
                   </span>
                 </div>
                 <div className="text-xs text-primary mt-1 font-mono">
-                  {jumlahDokumen} dari {MAKS_DOKUMEN} dokumen terpakai
+                  {jumlahDokumen} dari {maksDokumen} dokumen terpakai
                 </div>
               </div>
 
@@ -383,7 +386,7 @@ export function BerandaClient() {
                   </p>
                 </div>
                 <span className="text-xs font-mono text-on-surface-variant bg-surface-container-high border border-outline-variant px-2.5 py-1 rounded-full">
-                  {jumlahDokumen} dari {MAKS_DOKUMEN} Dokumen Terpakai
+                  {jumlahDokumen} dari {maksDokumen} Dokumen Terpakai
                 </span>
               </div>
 

@@ -1,10 +1,16 @@
-/**
- * Penyimpanan dokumen modul hasil upload (S-11) — simulasi client-side.
- * Akan diganti API backend (POST /api/documents) saat integrasi.
- */
+import { getPengaturanKuota } from "./quota";
 
-export const MAKS_UKURAN_MB = 50; // BR-02
-export const MAKS_DOKUMEN = 5; // BR-04
+export const MAKS_UKURAN_MB = 25; // BR-02 default UT
+export const MAKS_DOKUMEN = 5; // BR-04 default UT
+
+export function getMaksUkuranMb(): number {
+  return getPengaturanKuota().maksUkuranMb;
+}
+
+export function getMaksDokumen(): number {
+  return getPengaturanKuota().maksDokumen;
+}
+
 const KEY = "pahami_dokumen_upload";
 
 export interface TopikDokumen {
@@ -73,17 +79,18 @@ export function ubahNamaDokumen(id: string, judulBaru: string): { ok: true; dok:
 
 export type HasilValidasi = { ok: true } | { ok: false; pesan: string };
 
-/** BR-01: hanya PDF · BR-02: maks 50 MB */
+/** BR-01: hanya PDF · BR-02: maks ukuran MB dinamis (default 25 MB) */
 export function validasiFile(file: File): HasilValidasi {
   const adalahPdf =
     file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
   if (!adalahPdf) {
     return { ok: false, pesan: "Format file harus PDF. Pilih file berekstensi .pdf." };
   }
-  if (file.size > MAKS_UKURAN_MB * 1024 * 1024) {
+  const maksMb = getMaksUkuranMb();
+  if (file.size > maksMb * 1024 * 1024) {
     return {
       ok: false,
-      pesan: `Ukuran file maksimal ${MAKS_UKURAN_MB} MB. File kamu ${formatUkuran(file.size)}.`,
+      pesan: `Ukuran file maksimal ${maksMb} MB. File kamu ${formatUkuran(file.size)}.`,
     };
   }
   if (file.size === 0) {
