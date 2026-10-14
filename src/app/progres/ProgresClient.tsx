@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { type DokumenUpload, getDokumenUpload, statusTopik, ringkasDokumen, BATAS_SELESAI } from "@/lib/dokumen";
-import { ArrowRight, RotateCcw, CheckCircle2 } from "lucide-react";
+import { ArrowRight, RotateCcw, CheckCircle2, BookOpen } from "lucide-react";
 import { SYSTEM_MESSAGES as MSG } from "@/lib/messages";
 
 function formatWaktu(iso: string) {
@@ -134,10 +134,25 @@ export function ProgresClient() {
               </ul>
             </section>
 
-            {/* DAFTAR PERLU PENGUATAN (BR-13) / MSG-E03 */}
+            {/* DAFTAR PERLU PENGUATAN (BR-13) / MSG-E02 / MSG-E03 */}
             <section className="rounded-2xl border border-outline-variant bg-surface-container p-5 space-y-3">
               <h2 className="text-sm font-semibold">Perlu Penguatan</h2>
-              {perluPenguatan.length > 0 ? (
+              {dikerjakan.length === 0 ? (
+                <div className="p-4 rounded-xl bg-surface border border-outline-variant/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-on-surface-variant">
+                  <div className="flex items-center gap-2.5">
+                    <BookOpen className="w-4 h-4 shrink-0 text-primary" />
+                    <span>{MSG.MSG_E02}</span>
+                  </div>
+                  {topik.length > 0 && (
+                    <Link
+                      href={`/latihan/${dok.id}/${topik[0].id}`}
+                      className="px-4 py-2 rounded-full bg-primary text-on-primary text-xs font-semibold shrink-0 hover:opacity-90 transition text-center"
+                    >
+                      Mulai Latihan Pertama
+                    </Link>
+                  )}
+                </div>
+              ) : perluPenguatan.length > 0 ? (
                 <ul className="space-y-2">
                   {perluPenguatan.map((t) => (
                     <li
