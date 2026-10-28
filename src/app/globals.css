@@ -91,6 +91,17 @@ body {
   background-color: var(--surface);
   color: var(--on-surface);
   letter-spacing: -0.01em;
+  transition: padding-left 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* M3 Desktop Sidebar App-Shell Offset */
+@media (min-width: 768px) {
+  body:has([data-app-sidebar="expanded"]) {
+    padding-left: 16rem;
+  }
+  body:has([data-app-sidebar="collapsed"]) {
+    padding-left: 4.5rem;
+  }
 }
 
 /* Subtle Scrollbar M3 */
