@@ -39,11 +39,34 @@ export interface DokumenUpload {
   aktivitasTerakhir?: { topikId: string; waktu: string }; // BR-34
 }
 
+/**
+ * Membersihkan karakter simbol kotak / Private Use Area (Wingdings/Symbol dari PPT/Word)
+ * serta merapikan spasi/bullet pada teks hasil ekstraksi PDF.
+ */
+export function bersihkanTeksPdf(teks: string): string {
+  return teks
+    .replace(/[\u0000-\u001F\u007F-\u009F\uE000-\uF8FF\uFFFD\uF000-\uF0FF\u25A0-\u25AA\u25CF]+/g, " • ")
+    .replace(/(?:\s*•\s*)+/g, " • ")
+    .replace(/^[\s•]+/, "")
+    .replace(/\b([Jj])en\s+is\b/g, "$1enis")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function getDokumenUpload(): DokumenUpload[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? (JSON.parse(raw) as DokumenUpload[]) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as DokumenUpload[];
+    return parsed.map((dok) => ({
+      ...dok,
+      topik: (dok.topik ?? []).map((t) => ({
+        ...t,
+        ringkasan: t.ringkasan?.map(bersihkanTeksPdf).filter(Boolean),
+        kalimatLatihan: t.kalimatLatihan?.map(bersihkanTeksPdf).filter(Boolean),
+      })),
+    }));
   } catch {
     return [];
   }

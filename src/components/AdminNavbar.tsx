@@ -84,11 +84,13 @@ export function AdminNavbar() {
       ? "Pengaturan Kuota & Parameter Sistem (S-16)"
       : "Panel Pengelola Admin";
 
+  const isAdminSidebarRoute = pathname.startsWith("/admin");
+
   return (
     <>
       {/* 1. SIDEBAR KIRI DESKTOP ADMIN (Material Design 3 Navigation Drawer / Rail) */}
       <aside
-        data-app-sidebar={collapsed ? "collapsed" : "expanded"}
+        data-app-sidebar={isAdminSidebarRoute ? (collapsed ? "collapsed" : "expanded") : "none"}
         aria-label="Navigasi Samping Admin"
         className={`hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 z-50 bg-surface-container border-r border-outline-variant select-none transition-all duration-200 ${
           collapsed ? "w-[72px]" : "w-64"

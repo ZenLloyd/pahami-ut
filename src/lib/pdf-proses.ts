@@ -5,7 +5,7 @@
  * - membuat ringkasan ekstraktif (kalimat terpenting berdasarkan frekuensi kata)
  */
 import type { TopikDokumen } from "@/lib/dokumen";
-import { buatTopikSimulasi } from "@/lib/dokumen";
+import { buatTopikSimulasi, bersihkanTeksPdf } from "@/lib/dokumen";
 
 const STOPWORDS = new Set(
   (
@@ -41,11 +41,11 @@ export async function prosesPdf(file: File, onProgress: OnProgress): Promise<Has
   for (let i = 1; i <= total; i++) {
     const page = await pdf.getPage(i);
     const content = await page.getTextContent();
-    const teks = content.items
-      .map((it) => ("str" in it ? it.str : ""))
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
+    const teks = bersihkanTeksPdf(
+      content.items
+        .map((it) => ("str" in it ? it.str : ""))
+        .join(" ")
+    );
     teksHalaman.push(teks);
     onProgress(5 + Math.round((i / total) * 60), 1);
   }

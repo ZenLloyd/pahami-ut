@@ -28,6 +28,46 @@ import { getDokumenById, ubahStatusTopik, catatAktivitas, type DokumenUpload } f
 import { useEffect } from "react";
 
 import { useSearchParams } from "next/navigation";
+import { bersihkanTeksPdf } from "@/lib/dokumen";
+
+function renderFormattedText(teks: string) {
+  const bersih = bersihkanTeksPdf(teks);
+  // Pisahkan berdasarkan pola **tebal**, *miring*, dan `kode`
+  const parts = teks
+    .replace(/[\u0000-\u0009\u000B-\u001F\u007F-\u009F\uE000-\uF8FF\uFFFD\uF000-\uF0FF]+/g, " • ")
+    .replace(/\b([Jj])en\s+is\b/g, "$1enis")
+    .split(/(\*\*[^*]+\*\*|\*[^*\n]+\*|`[^`]+`)/g);
+
+  if (!parts || parts.length === 0) return bersih;
+
+  return parts.map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      return (
+        <strong key={idx} className="font-semibold text-on-surface">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
+      return (
+        <em key={idx} className="italic text-on-surface/90">
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+    if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
+      return (
+        <code
+          key={idx}
+          className="px-1.5 py-0.5 rounded bg-surface-container-high font-mono text-[11px] text-primary"
+        >
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    return <span key={idx}>{part}</span>;
+  });
+}
 
 export function LearningRoomClient({ moduleId }: { moduleId: string }) {
   const searchParams = useSearchParams();
@@ -202,7 +242,7 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
   };
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden bg-surface text-on-surface text-sm select-none">
+    <div className="h-screen w-full flex flex-col overflow-hidden bg-surface text-on-surface text-sm select-none">
       {/* TOP NAVBAR / HEADER */}
       <header className="h-14 border-b border-outline-variant bg-surface-container px-3 sm:px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 overflow-hidden">
@@ -671,7 +711,7 @@ export function LearningRoomClient({ moduleId }: { moduleId: string }) {
 
                       {/* Content */}
                       <div className="text-xs text-on-surface leading-relaxed whitespace-pre-line">
-                        {msg.text}
+                        {renderFormattedText(msg.text)}
                       </div>
 
                       {/* Prompt Kuis Adaptif */}

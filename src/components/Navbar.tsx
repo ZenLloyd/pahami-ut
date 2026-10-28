@@ -131,11 +131,16 @@ export function Navbar() {
       ? "Latihan Soal & Pembahasan (S-09 / S-10)"
       : "Ruang Belajar Mandiri";
 
+  const isSidebarRoute =
+    ["/beranda", "/dashboard", "/upload", "/progres", "/profil"].includes(pathname) ||
+    pathname.startsWith("/dokumen/") ||
+    pathname.startsWith("/latihan/");
+
   return (
     <>
       {/* 1. SIDEBAR KIRI DESKTOP (Material Design 3 Navigation Drawer / Rail) */}
       <aside
-        data-app-sidebar={collapsed ? "collapsed" : "expanded"}
+        data-app-sidebar={isSidebarRoute ? (collapsed ? "collapsed" : "expanded") : "none"}
         aria-label="Navigasi Samping Utama"
         className={`hidden md:flex md:flex-col md:fixed md:inset-y-0 md:left-0 z-50 bg-surface-container border-r border-outline-variant select-none transition-all duration-200 ${
           collapsed ? "w-[72px]" : "w-64"
