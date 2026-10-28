@@ -17,9 +17,9 @@ export interface Pengguna {
 const STORAGE_KEY_USERS = "pahami_users_db";
 const STORAGE_KEY_SESSION = "pahami_session";
 const STORAGE_KEY_VERSION = "pahami_db_version";
-const DB_VERSION = "v3_pengguna_s15";
+const DB_VERSION = "v4_pengguna_uji_tim";
 
-// Data Awal Bawaan Sistem
+// Data Awal Bawaan Sistem (Mendukung akun demo UT & akun uji tim Wasil)
 const DEFAULT_USERS: Pengguna[] = [
   {
     nama: "Abdurahman Ghozali",
@@ -30,6 +30,16 @@ const DEFAULT_USERS: Pengguna[] = [
     dibuatPada: "2026-10-01T08:00:00Z",
     terakhirAktif: "2026-10-14T19:30:00Z",
     jumlahDokumen: 1,
+  },
+  {
+    nama: "Mahasiswa Uji Pahami",
+    email: "uji.pahami+1@example.com",
+    kataSandi: "rahasia123",
+    role: "mahasiswa",
+    isAktif: true,
+    dibuatPada: "2026-10-15T08:00:00Z",
+    terakhirAktif: "2026-10-28T16:50:00Z",
+    jumlahDokumen: 2,
   },
   {
     nama: "Anisa Putri",
@@ -79,6 +89,15 @@ const DEFAULT_USERS: Pengguna[] = [
     isAktif: true,
     dibuatPada: "2026-09-01T00:00:00Z",
     terakhirAktif: "2026-10-14T20:00:00Z",
+  },
+  {
+    nama: "Admin Uji Pahami",
+    email: "uji.pahami+admin@example.com",
+    kataSandi: "rahasia123",
+    role: "admin",
+    isAktif: true,
+    dibuatPada: "2026-09-15T00:00:00Z",
+    terakhirAktif: "2026-10-28T16:52:00Z",
   },
 ];
 
